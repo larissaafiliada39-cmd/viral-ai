@@ -1,0 +1,9 @@
+{
+  "name": "VIRAL AI",
+  "short_name": "VIRAL AI",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d0b14",
+  "theme_color": "#171324",
+  "description": "Estúdio de criação de roteiros e prompts de vídeo."
+}
