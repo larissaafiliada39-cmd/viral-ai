@@ -1,3 +1,4 @@
+
 import 'dotenv/config';
 
 import express from 'express';
@@ -14,8 +15,8 @@ import { spawn } from 'node:child_process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
 
-// Pasta temporária gravável para os dados do aplicativo.
-const DATA = process.env.DATA_DIR || '/tmp/viral-ai-data';
+// Usa uma pasta temporária gravável no Hostless.
+const DATA = '/tmp/viral-ai-data';
 const VIDEOS = path.join(DATA, 'videos');
 const JOBS_FILE = path.join(DATA, 'jobs.json');
 
@@ -24,8 +25,7 @@ const MODEL = process.env.MODEL || 'gemini-omni-1.1-flash';
 
 const app = express();
 
-// A chave cadastrada pelo aplicativo fica somente na memória do servidor.
-// Ela não é gravada no navegador nem em arquivo.
+// Chave recebida pelo aplicativo: fica somente na memória.
 let runtimeGeminiKey = '';
 
 await fs.mkdir(VIDEOS, { recursive: true });
@@ -54,17 +54,13 @@ const hasKey = () => Boolean(getGeminiKey());
 const ai = () => {
   const key = getGeminiKey();
 
-  if (!key) {
-    throw new Error('GEMINI_KEY_MISSING');
-  }
+  if (!key) throw new Error('GEMINI_KEY_MISSING');
 
   return new GoogleGenAI({ apiKey: key });
 };
 
-const safeName = value =>
-  String(value).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 80);
-
 app.use(helmet({
+  contentSecurityPolicy: false,
   crossOriginResourcePolicy: { policy: 'cross-origin' }
 }));
 
@@ -83,8 +79,6 @@ app.use('/api/', rateLimit({
   legacyHeaders: false
 }));
 
-app.use(express.static(ROOT));
-
 app.get('/api/status', (_req, res) => {
   res.json({
     ok: true,
@@ -95,18 +89,11 @@ app.get('/api/status', (_req, res) => {
   });
 });
 
-// Recebe a chave enviada pela janela de configuração do VIRAL AI.
-// A chave não é devolvida na resposta e não é registrada em logs.
+// Recebe a chave Gemini pelo próprio aplicativo.
 app.post('/api/settings/gemini-key', (req, res) => {
   const apiKey = String(req.body?.apiKey || '').trim();
 
-  if (!apiKey) {
-    return res.status(400).json({
-      error: 'Cole uma chave Gemini válida.'
-    });
-  }
-
-  if (apiKey.length > 500) {
+  if (!apiKey || apiKey.length > 500) {
     return res.status(400).json({
       error: 'A chave informada é inválida.'
     });
@@ -114,10 +101,10 @@ app.post('/api/settings/gemini-key', (req, res) => {
 
   runtimeGeminiKey = apiKey;
 
-  return res.json({
+  res.json({
     ok: true,
     keyConfigured: true,
-    message: 'Chave recebida pelo servidor. Ela ficará disponível até o servidor reiniciar.'
+    message: 'Chave recebida pelo servidor.'
   });
 });
 
@@ -230,7 +217,7 @@ async function generateScene(project, scene) {
     }
 
     const filename =
-      `${safeName(project.id)}_${safeName(scene.id)}.mp4`;
+      `${project.id}_${scene.id}.mp4`;
 
     await fs.writeFile(
       path.join(VIDEOS, filename),
@@ -245,13 +232,17 @@ async function generateScene(project, scene) {
 
     scene.error =
       error.message === 'GEMINI_KEY_MISSING'
-        ? 'A chave Gemini ainda não foi configurada no servidor.'
+        ? 'A chave Gemini ainda não foi configurada.'
         : String(error.message || 'Falha na geração').slice(0, 500);
   }
 
   await persist();
-}async function runProject(id) {
+}
+
+async function runProject(id) {
   const project = jobs[id];
+
+  if (!project) return;
 
   project.status = 'generating';
   await persist();
@@ -362,10 +353,7 @@ app.post(
 
 function ffmpegConcat(files, output) {
   return new Promise((resolve, reject) => {
-    const list = path.join(
-      DATA,
-      `concat_${nanoid(8)}.txt`
-    );
+    const list = path.join(DATA, `concat_${nanoid(8)}.txt`);
 
     fs.writeFile(
       list,
@@ -373,21 +361,14 @@ function ffmpegConcat(files, output) {
         `file '${file.replaceAll("'", "'\\''")}'`
       ).join('\n')
     ).then(() => {
-
       const child = spawn('ffmpeg', [
         '-y',
-        '-f',
-        'concat',
-        '-safe',
-        '0',
-        '-i',
-        list,
-        '-c:v',
-        'libx264',
-        '-c:a',
-        'aac',
-        '-movflags',
-        '+faststart',
+        '-f', 'concat',
+        '-safe', '0',
+        '-i', list,
+        '-c:v', 'libx264',
+        '-c:a', 'aac',
+        '-movflags', '+faststart',
         output
       ]);
 
@@ -403,17 +384,13 @@ function ffmpegConcat(files, output) {
         if (code === 0) {
           resolve();
         } else {
-          reject(
-            new Error(
-              errorOutput.slice(-1200) ||
-              'Falha no FFmpeg.'
-            )
-          );
+          reject(new Error(
+            errorOutput.slice(-1200) || 'Falha no FFmpeg.'
+          ));
         }
       });
 
       child.on('error', reject);
-
     }).catch(reject);
   });
 }
@@ -440,7 +417,7 @@ app.post('/api/projects/:id/merge', async (req, res) => {
     path.join(VIDEOS, path.basename(scene.videoUrl))
   );
 
-  const outputName = `${safeName(project.id)}_final.mp4`;
+  const outputName = `${project.id}_final.mp4`;
   const output = path.join(VIDEOS, outputName);
 
   try {
@@ -455,7 +432,6 @@ app.post('/api/projects/:id/merge', async (req, res) => {
       ok: true,
       finalUrl: project.finalUrl
     });
-
   } catch (error) {
     res.status(500).json({
       error: `Não foi possível unir os clipes: ${error.message}`
@@ -463,18 +439,7 @@ app.post('/api/projects/:id/merge', async (req, res) => {
   }
 });
 
-app.use(
-  '/media',
-  express.static(VIDEOS, {
-    fallthrough: false,
-    setHeaders: response => {
-      response.setHeader(
-        'Cache-Control',
-        'private, max-age=3600'
-      );
-    }
-  })
-);
+app.use('/media', express.static(VIDEOS));
 
 app.use((error, req, res, next) => {
   console.error('Erro no servidor:', error.message);
@@ -482,6 +447,10 @@ app.use((error, req, res, next) => {
   res.status(500).json({
     error: 'Erro interno no servidor.'
   });
+});
+
+app.get('/', (_req, res) => {
+  res.sendFile(path.join(ROOT, 'index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
