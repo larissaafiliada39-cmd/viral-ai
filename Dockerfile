@@ -9,13 +9,16 @@ COPY package.json ./package.json
 
 RUN npm install --omit=dev
 
-RUN npx playwright install --with-deps chromium
+# Instala o Chromium em modo headless e suas dependências.
+RUN npx playwright install --with-deps --only-shell chromium
 
 COPY . .
 
 RUN mkdir -p /app/data
 
-ENV NODE_ENV=production DATA_DIR=/app/data PORT=3000
+ENV NODE_ENV=production
+ENV DATA_DIR=/app/data
+ENV PORT=3000
 
 EXPOSE 3000
 
