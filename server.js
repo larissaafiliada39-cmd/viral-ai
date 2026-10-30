@@ -16,6 +16,7 @@ import { spawn } from 'node:child_process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
 
+// Usa uma pasta temporária gravável no Hostless.
 const DATA = '/tmp/viral-ai-data';
 const VIDEOS = path.join(DATA, 'videos');
 const JOBS_FILE = path.join(DATA, 'jobs.json');
@@ -25,6 +26,7 @@ const MODEL = process.env.MODEL || 'gemini-omni-1.1-flash';
 
 const app = express();
 
+// Chave recebida pelo aplicativo: fica somente na memória.
 let runtimeGeminiKey = '';
 
 await fs.mkdir(VIDEOS, { recursive: true });
@@ -84,13 +86,23 @@ app.get('/api/status', (_req, res) => {
     provider: 'Google Gemini',
     model: MODEL,
     keyConfigured: hasKey(),
-    browserAutomation: 'Playwright instalado; teste disponível',
     setupUrl: 'https://aistudio.google.com/api-keys'
   });
 });
 
-// Testa se o Chromium consegue iniciar no servidor.
+// Testa se o Chromium instalado pelo Playwright consegue abrir.
+let browserCheckRunning = false;
+
 app.get('/api/flow/browser-check', async (_req, res) => {
+  if (browserCheckRunning) {
+    return res.status(409).json({
+      ok: false,
+      error: 'Já existe um teste do navegador em andamento.'
+    });
+  }
+
+  browserCheckRunning = true;
+
   let browser;
 
   try {
@@ -102,36 +114,37 @@ app.get('/api/flow/browser-check', async (_req, res) => {
       ]
     });
 
-    const version = browser.version();
-
     const page = await browser.newPage();
+
     await page.goto('about:blank');
 
-    const title = await page.title();
+    const version = browser.version();
 
     await browser.close();
     browser = null;
 
-    res.json({
+    return res.json({
       ok: true,
       browser: 'Chromium',
       version,
       pageOpened: true,
-      pageTitle: title,
-      message: 'O navegador iniciou e abriu uma página de teste.'
+      message: 'O Chromium abriu uma página de teste com sucesso.'
     });
+
   } catch (error) {
     if (browser) {
       await browser.close().catch(() => {});
     }
 
-    console.error('Falha no teste Chromium:', error.message);
+    console.error('Erro no teste do Chromium:', error);
 
-    res.status(500).json({
+    return res.status(500).json({
       ok: false,
-      browser: 'Chromium',
-      error: String(error.message || 'Falha ao iniciar navegador').slice(0, 700)
+      error: String(error.message || 'Falha ao iniciar o Chromium').slice(0, 700)
     });
+
+  } finally {
+    browserCheckRunning = false;
   }
 });
 
