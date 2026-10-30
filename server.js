@@ -16,14 +16,12 @@ import { spawn } from 'node:child_process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
 
-const DATA = process.env.DATA_DIR || '/tmp/viral-ai-data';
+const DATA = '/tmp/viral-ai-data';
 const VIDEOS = path.join(DATA, 'videos');
 const JOBS_FILE = path.join(DATA, 'jobs.json');
 
 const PORT = Number(process.env.PORT || 3000);
 const MODEL = process.env.MODEL || 'gemini-omni-1.1-flash';
-
-const FLOW_URL = 'https://labs.google/fx/tools/flow';
 
 const app = express();
 
@@ -31,6 +29,7 @@ app.set('trust proxy', 1);
 
 let runtimeGeminiKey = '';
 
+await fs.mkdir(DATA, { recursive: true });
 await fs.mkdir(VIDEOS, { recursive: true });
 
 let jobs = {};
@@ -82,10 +81,7 @@ app.use('/api/', rateLimit({
   legacyHeaders: false
 }));
 
-// ======================================================
-// STATUS DO APLICATIVO
-// ======================================================
-
+// STATUS
 app.get('/api/status', (_req, res) => {
   res.json({
     ok: true,
@@ -97,13 +93,7 @@ app.get('/api/status', (_req, res) => {
   });
 });
 
-// ======================================================
-// NAVEGADOR DO GOOGLE FLOW
-// ======================================================
-
-// A sessão fica na memória do servidor.
-// Se o servidor reiniciar, será necessário iniciar outra sessão.
-
+// NAVEGADOR GOOGLE FLOW
 let flowBrowser = null;
 let flowContext = null;
 let flowPage = null;
@@ -138,7 +128,6 @@ async function closeFlowSession() {
   }
 }
 
-// Inicia o navegador e abre o Google Flow.
 app.post('/api/flow/session/start', async (_req, res) => {
   if (flowStarting) {
     return res.status(409).json({
@@ -147,7 +136,7 @@ app.post('/api/flow/session/start', async (_req, res) => {
     });
   }
 
-  if (flowBrowser && flowPage && flowPage.isClosed() === false) {
+  if (flowBrowser && flowPage && !flowPage.isClosed()) {
     return res.json({
       ok: true,
       active: true,
@@ -182,13 +171,12 @@ app.post('/api/flow/session/start', async (_req, res) => {
     });
 
     flowPage = await flowContext.newPage();
-
     flowToken = nanoid(40);
 
     flowPage.setDefaultTimeout(20000);
 
     try {
-      await flowPage.goto(FLOW_URL, {
+      await flowPage.goto('https://labs.google/fx/tools/flow', {
         waitUntil: 'domcontentloaded',
         timeout: 60000
       });
@@ -221,7 +209,6 @@ app.post('/api/flow/session/start', async (_req, res) => {
   }
 });
 
-// Verifica se existe uma sessão ativa.
 app.get('/api/flow/session/status', checkFlowToken, (_req, res) => {
   res.json({
     ok: true,
@@ -236,7 +223,6 @@ app.get('/api/flow/session/status', checkFlowToken, (_req, res) => {
   });
 });
 
-// Captura uma imagem da tela do navegador.
 app.get('/api/flow/session/screen', checkFlowToken, async (_req, res) => {
   try {
     if (!flowPage || flowPage.isClosed()) {
@@ -267,7 +253,6 @@ app.get('/api/flow/session/screen', checkFlowToken, async (_req, res) => {
   }
 });
 
-// Abre uma página permitida no navegador.
 app.post('/api/flow/session/navigate', checkFlowToken, async (req, res) => {
   try {
     if (!flowPage || flowPage.isClosed()) {
@@ -321,7 +306,6 @@ app.post('/api/flow/session/navigate', checkFlowToken, async (req, res) => {
   }
 });
 
-// Clica em uma posição da tela.
 app.post('/api/flow/session/click', checkFlowToken, async (req, res) => {
   try {
     if (!flowPage || flowPage.isClosed()) {
@@ -362,7 +346,6 @@ app.post('/api/flow/session/click', checkFlowToken, async (req, res) => {
   }
 });
 
-// Digita texto no campo selecionado.
 app.post('/api/flow/session/type', checkFlowToken, async (req, res) => {
   try {
     if (!flowPage || flowPage.isClosed()) {
@@ -395,7 +378,6 @@ app.post('/api/flow/session/type', checkFlowToken, async (req, res) => {
   }
 });
 
-// Pressiona uma tecla.
 app.post('/api/flow/session/key', checkFlowToken, async (req, res) => {
   try {
     if (!flowPage || flowPage.isClosed()) {
@@ -441,7 +423,6 @@ app.post('/api/flow/session/key', checkFlowToken, async (req, res) => {
   }
 });
 
-// Encerra a sessão.
 app.post('/api/flow/session/stop', checkFlowToken, async (_req, res) => {
   await closeFlowSession();
 
@@ -451,7 +432,7 @@ app.post('/api/flow/session/stop', checkFlowToken, async (_req, res) => {
   });
 });
 
-// Teste do Chromium.
+// TESTE DO CHROMIUM
 app.get('/api/flow/browser-check', async (_req, res) => {
   let browser;
 
@@ -493,10 +474,7 @@ app.get('/api/flow/browser-check', async (_req, res) => {
   }
 });
 
-// ======================================================
 // CHAVE GEMINI
-// ======================================================
-
 app.post('/api/settings/gemini-key', (req, res) => {
   const apiKey = String(req.body?.apiKey || '').trim();
 
@@ -515,10 +493,7 @@ app.post('/api/settings/gemini-key', (req, res) => {
   });
 });
 
-// ======================================================
 // PROJETOS
-// ======================================================
-
 app.get('/api/projects', (_req, res) => {
   res.json({
     projects: Object.values(jobs).map(
@@ -602,10 +577,7 @@ app.post('/api/projects', async (req, res) => {
   res.status(201).json(jobs[id]);
 });
 
-// ======================================================
-// GERAÇÃO DE CENAS GEMINI
-// ======================================================
-
+// GERAÇÃO GEMINI
 async function generateScene(project, scene) {
   scene.status = 'generating';
   scene.error = null;
@@ -770,10 +742,7 @@ app.post(
   }
 );
 
-// ======================================================
-// MONTAGEM DOS VÍDEOS
-// ======================================================
-
+// MONTAGEM DE VÍDEOS
 function ffmpegConcat(files, output) {
   return new Promise((resolve, reject) => {
     const list = path.join(DATA, `concat_${nanoid(8)}.txt`);
@@ -863,10 +832,7 @@ app.post('/api/projects/:id/merge', async (req, res) => {
   }
 });
 
-// ======================================================
 // ARQUIVOS E PÁGINA PRINCIPAL
-// ======================================================
-
 app.use('/media', express.static(VIDEOS));
 
 app.get('/', (_req, res) => {
@@ -885,10 +851,7 @@ app.use((error, req, res, next) => {
   });
 });
 
-// ======================================================
-// ENCERRAMENTO SEGURO
-// ======================================================
-
+// ENCERRAMENTO
 async function shutdown() {
   console.log('Encerrando VIRAL AI...');
 
