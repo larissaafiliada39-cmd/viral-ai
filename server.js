@@ -14,9 +14,8 @@ import { spawn } from 'node:child_process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
 
-const DATA = path.resolve(
-  process.env.DATA_DIR || path.join(ROOT, 'data')
-);
+// Usa uma pasta temporária gravável para os dados.
+const DATA = '/tmp/viral-ai-data';
 const VIDEOS = path.join(DATA, 'videos');
 const JOBS_FILE = path.join(DATA, 'jobs.json');
 
@@ -25,7 +24,6 @@ const MODEL = process.env.MODEL || 'gemini-omni-1.1-flash';
 
 const app = express();
 
-// Cria as pastas necessárias antes de iniciar o servidor.
 await fs.mkdir(DATA, { recursive: true });
 await fs.mkdir(VIDEOS, { recursive: true });
 
@@ -72,7 +70,6 @@ app.use('/api/', rateLimit({
   legacyHeaders: false
 }));
 
-// Página inicial do aplicativo.
 app.get('/', (_req, res) => {
   res.sendFile(path.join(ROOT, 'index.html'));
 });
