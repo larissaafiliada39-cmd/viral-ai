@@ -16,19 +16,19 @@ import { spawn } from 'node:child_process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
 
-const DATA = '/tmp/viral-ai-data';
+const DATA = process.env.DATA_DIR || '/tmp/viral-ai-data';
 const VIDEOS = path.join(DATA, 'videos');
 const JOBS_FILE = path.join(DATA, 'jobs.json');
 
 const PORT = Number(process.env.PORT || 3000);
 const MODEL = process.env.MODEL || 'gemini-omni-1.1-flash';
 
+const FLOW_URL = 'https://labs.google/fx/tools/flow';
+
 const app = express();
 
-// O Hostless usa proxy reverso. Confia no primeiro proxy à frente do app.
 app.set('trust proxy', 1);
 
-// Chave recebida pelo aplicativo: fica somente na memória.
 let runtimeGeminiKey = '';
 
 await fs.mkdir(VIDEOS, { recursive: true });
@@ -77,10 +77,14 @@ app.use(express.json({ limit: '2mb' }));
 
 app.use('/api/', rateLimit({
   windowMs: 60_000,
-  limit: 30,
+  limit: 60,
   standardHeaders: true,
   legacyHeaders: false
 }));
+
+// ======================================================
+// STATUS DO APLICATIVO
+// ======================================================
 
 app.get('/api/status', (_req, res) => {
   res.json({
@@ -88,22 +92,367 @@ app.get('/api/status', (_req, res) => {
     provider: 'Google Gemini',
     model: MODEL,
     keyConfigured: hasKey(),
+    flowBrowserAvailable: true,
     setupUrl: 'https://aistudio.google.com/api-keys'
   });
 });
 
-// Teste temporário para verificar o Chromium no servidor.
-let browserCheckRunning = false;
+// ======================================================
+// NAVEGADOR DO GOOGLE FLOW
+// ======================================================
 
-app.get('/api/flow/browser-check', async (_req, res) => {
-  if (browserCheckRunning) {
-    return res.status(409).json({
+// A sessão fica na memória do servidor.
+// Se o servidor reiniciar, será necessário iniciar outra sessão.
+
+let flowBrowser = null;
+let flowContext = null;
+let flowPage = null;
+let flowToken = null;
+let flowStarting = false;
+
+function checkFlowToken(req, res, next) {
+  const suppliedToken = String(req.headers['x-flow-token'] || '');
+
+  if (!flowToken || suppliedToken !== flowToken) {
+    return res.status(401).json({
       ok: false,
-      error: 'Já existe um teste do navegador em andamento.'
+      error: 'Sessão não autorizada. Inicie o navegador novamente.'
     });
   }
 
-  browserCheckRunning = true;
+  next();
+}
+
+async function closeFlowSession() {
+  const browser = flowBrowser;
+
+  flowBrowser = null;
+  flowContext = null;
+  flowPage = null;
+  flowToken = null;
+
+  if (browser) {
+    await browser.close().catch(error => {
+      console.error('Erro ao fechar navegador Flow:', error.message);
+    });
+  }
+}
+
+// Inicia o navegador e abre o Google Flow.
+app.post('/api/flow/session/start', async (_req, res) => {
+  if (flowStarting) {
+    return res.status(409).json({
+      ok: false,
+      error: 'O navegador está iniciando. Aguarde um momento.'
+    });
+  }
+
+  if (flowBrowser && flowPage && flowPage.isClosed() === false) {
+    return res.json({
+      ok: true,
+      active: true,
+      token: flowToken,
+      message: 'O navegador já está aberto.'
+    });
+  }
+
+  flowStarting = true;
+
+  try {
+    await closeFlowSession();
+
+    flowBrowser = await chromium.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--no-first-run',
+        '--no-default-browser-check'
+      ]
+    });
+
+    flowContext = await flowBrowser.newContext({
+      viewport: {
+        width: 1365,
+        height: 900
+      },
+      deviceScaleFactor: 1,
+      acceptDownloads: true
+    });
+
+    flowPage = await flowContext.newPage();
+
+    flowToken = nanoid(40);
+
+    flowPage.setDefaultTimeout(20000);
+
+    try {
+      await flowPage.goto(FLOW_URL, {
+        waitUntil: 'domcontentloaded',
+        timeout: 60000
+      });
+    } catch (navigationError) {
+      console.error(
+        'Aviso ao abrir Google Flow:',
+        navigationError.message
+      );
+    }
+
+    return res.json({
+      ok: true,
+      active: true,
+      token: flowToken,
+      message: 'Navegador iniciado. Verifique a tela para continuar.'
+    });
+  } catch (error) {
+    await closeFlowSession();
+
+    console.error('Erro ao iniciar navegador Flow:', error);
+
+    return res.status(500).json({
+      ok: false,
+      error: String(
+        error.message || 'Não foi possível iniciar o navegador.'
+      ).slice(0, 700)
+    });
+  } finally {
+    flowStarting = false;
+  }
+});
+
+// Verifica se existe uma sessão ativa.
+app.get('/api/flow/session/status', checkFlowToken, (_req, res) => {
+  res.json({
+    ok: true,
+    active: Boolean(
+      flowBrowser &&
+      flowPage &&
+      !flowPage.isClosed()
+    ),
+    url: flowPage && !flowPage.isClosed()
+      ? flowPage.url()
+      : null
+  });
+});
+
+// Captura uma imagem da tela do navegador.
+app.get('/api/flow/session/screen', checkFlowToken, async (_req, res) => {
+  try {
+    if (!flowPage || flowPage.isClosed()) {
+      return res.status(409).json({
+        ok: false,
+        error: 'O navegador não está aberto.'
+      });
+    }
+
+    const screenshot = await flowPage.screenshot({
+      type: 'jpeg',
+      quality: 65,
+      fullPage: false
+    });
+
+    res.json({
+      ok: true,
+      image: screenshot.toString('base64'),
+      url: flowPage.url(),
+      width: 1365,
+      height: 900
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: String(error.message || 'Falha ao capturar a tela.').slice(0, 500)
+    });
+  }
+});
+
+// Abre uma página permitida no navegador.
+app.post('/api/flow/session/navigate', checkFlowToken, async (req, res) => {
+  try {
+    if (!flowPage || flowPage.isClosed()) {
+      return res.status(409).json({
+        ok: false,
+        error: 'O navegador não está aberto.'
+      });
+    }
+
+    const address = String(req.body?.url || '').trim();
+
+    let parsedUrl;
+
+    try {
+      parsedUrl = new URL(address);
+    } catch {
+      return res.status(400).json({
+        ok: false,
+        error: 'Endereço inválido.'
+      });
+    }
+
+    if (
+      parsedUrl.protocol !== 'https:' ||
+      ![
+        'labs.google',
+        'accounts.google.com',
+        'www.google.com'
+      ].includes(parsedUrl.hostname)
+    ) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Por segurança, só é permitido acessar páginas do Google.'
+      });
+    }
+
+    await flowPage.goto(parsedUrl.href, {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000
+    });
+
+    res.json({
+      ok: true,
+      url: flowPage.url()
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: String(error.message || 'Falha ao navegar.').slice(0, 500)
+    });
+  }
+});
+
+// Clica em uma posição da tela.
+app.post('/api/flow/session/click', checkFlowToken, async (req, res) => {
+  try {
+    if (!flowPage || flowPage.isClosed()) {
+      return res.status(409).json({
+        ok: false,
+        error: 'O navegador não está aberto.'
+      });
+    }
+
+    const x = Number(req.body?.x);
+    const y = Number(req.body?.y);
+
+    if (
+      !Number.isFinite(x) ||
+      !Number.isFinite(y) ||
+      x < 0 ||
+      y < 0 ||
+      x > 1365 ||
+      y > 900
+    ) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Coordenadas inválidas.'
+      });
+    }
+
+    await flowPage.mouse.click(x, y);
+
+    res.json({
+      ok: true,
+      message: 'Clique realizado.'
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: String(error.message || 'Falha ao clicar.').slice(0, 500)
+    });
+  }
+});
+
+// Digita texto no campo selecionado.
+app.post('/api/flow/session/type', checkFlowToken, async (req, res) => {
+  try {
+    if (!flowPage || flowPage.isClosed()) {
+      return res.status(409).json({
+        ok: false,
+        error: 'O navegador não está aberto.'
+      });
+    }
+
+    const value = String(req.body?.text || '');
+
+    if (!value || value.length > 12000) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Texto vazio ou muito longo.'
+      });
+    }
+
+    await flowPage.keyboard.insertText(value);
+
+    res.json({
+      ok: true,
+      message: 'Texto digitado.'
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: String(error.message || 'Falha ao digitar.').slice(0, 500)
+    });
+  }
+});
+
+// Pressiona uma tecla.
+app.post('/api/flow/session/key', checkFlowToken, async (req, res) => {
+  try {
+    if (!flowPage || flowPage.isClosed()) {
+      return res.status(409).json({
+        ok: false,
+        error: 'O navegador não está aberto.'
+      });
+    }
+
+    const allowedKeys = [
+      'Enter',
+      'Tab',
+      'Escape',
+      'Backspace',
+      'Delete',
+      'ArrowUp',
+      'ArrowDown',
+      'ArrowLeft',
+      'ArrowRight',
+      'Space'
+    ];
+
+    const key = String(req.body?.key || '');
+
+    if (!allowedKeys.includes(key)) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Tecla não permitida.'
+      });
+    }
+
+    await flowPage.keyboard.press(key);
+
+    res.json({
+      ok: true,
+      message: 'Tecla pressionada.'
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: String(error.message || 'Falha ao pressionar tecla.').slice(0, 500)
+    });
+  }
+});
+
+// Encerra a sessão.
+app.post('/api/flow/session/stop', checkFlowToken, async (_req, res) => {
+  await closeFlowSession();
+
+  res.json({
+    ok: true,
+    message: 'Navegador encerrado.'
+  });
+});
+
+// Teste do Chromium.
+app.get('/api/flow/browser-check', async (_req, res) => {
   let browser;
 
   try {
@@ -123,7 +472,7 @@ app.get('/api/flow/browser-check', async (_req, res) => {
     await browser.close();
     browser = null;
 
-    return res.json({
+    res.json({
       ok: true,
       browser: 'Chromium',
       version,
@@ -137,16 +486,17 @@ app.get('/api/flow/browser-check', async (_req, res) => {
 
     console.error('Erro no teste do Chromium:', error);
 
-    return res.status(500).json({
+    res.status(500).json({
       ok: false,
       error: String(error.message || 'Falha ao iniciar o Chromium').slice(0, 700)
     });
-  } finally {
-    browserCheckRunning = false;
   }
 });
 
-// Recebe a chave Gemini pelo próprio aplicativo.
+// ======================================================
+// CHAVE GEMINI
+// ======================================================
+
 app.post('/api/settings/gemini-key', (req, res) => {
   const apiKey = String(req.body?.apiKey || '').trim();
 
@@ -164,6 +514,10 @@ app.post('/api/settings/gemini-key', (req, res) => {
     message: 'Chave recebida pelo servidor.'
   });
 });
+
+// ======================================================
+// PROJETOS
+// ======================================================
 
 app.get('/api/projects', (_req, res) => {
   res.json({
@@ -247,6 +601,10 @@ app.post('/api/projects', async (req, res) => {
 
   res.status(201).json(jobs[id]);
 });
+
+// ======================================================
+// GERAÇÃO DE CENAS GEMINI
+// ======================================================
 
 async function generateScene(project, scene) {
   scene.status = 'generating';
@@ -412,6 +770,10 @@ app.post(
   }
 );
 
+// ======================================================
+// MONTAGEM DOS VÍDEOS
+// ======================================================
+
 function ffmpegConcat(files, output) {
   return new Promise((resolve, reject) => {
     const list = path.join(DATA, `concat_${nanoid(8)}.txt`);
@@ -501,19 +863,42 @@ app.post('/api/projects/:id/merge', async (req, res) => {
   }
 });
 
+// ======================================================
+// ARQUIVOS E PÁGINA PRINCIPAL
+// ======================================================
+
 app.use('/media', express.static(VIDEOS));
+
+app.get('/', (_req, res) => {
+  res.sendFile(path.join(ROOT, 'index.html'));
+});
 
 app.use((error, req, res, next) => {
   console.error('Erro no servidor:', error.message);
+
+  if (res.headersSent) {
+    return next(error);
+  }
 
   res.status(500).json({
     error: 'Erro interno no servidor.'
   });
 });
 
-app.get('/', (_req, res) => {
-  res.sendFile(path.join(ROOT, 'index.html'));
-});
+// ======================================================
+// ENCERRAMENTO SEGURO
+// ======================================================
+
+async function shutdown() {
+  console.log('Encerrando VIRAL AI...');
+
+  await closeFlowSession();
+
+  process.exit(0);
+}
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`VIRAL AI backend ativo na porta ${PORT}`);
