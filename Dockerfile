@@ -1,13 +1,15 @@
 
 FROM node:22-bookworm-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
 
 COPY package.json ./package.json
 
 RUN npm install --omit=dev
+
+RUN npx playwright install --with-deps chromium
 
 COPY . .
 
