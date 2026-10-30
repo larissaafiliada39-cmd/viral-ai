@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import { GoogleGenAI } from '@google/genai';
+import { chromium } from 'playwright';
 import { nanoid } from 'nanoid';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -15,7 +16,6 @@ import { spawn } from 'node:child_process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
 
-// Usa uma pasta temporária gravável no Hostless.
 const DATA = '/tmp/viral-ai-data';
 const VIDEOS = path.join(DATA, 'videos');
 const JOBS_FILE = path.join(DATA, 'jobs.json');
@@ -25,7 +25,6 @@ const MODEL = process.env.MODEL || 'gemini-omni-1.1-flash';
 
 const app = express();
 
-// Chave recebida pelo aplicativo: fica somente na memória.
 let runtimeGeminiKey = '';
 
 await fs.mkdir(VIDEOS, { recursive: true });
@@ -85,8 +84,55 @@ app.get('/api/status', (_req, res) => {
     provider: 'Google Gemini',
     model: MODEL,
     keyConfigured: hasKey(),
+    browserAutomation: 'Playwright instalado; teste disponível',
     setupUrl: 'https://aistudio.google.com/api-keys'
   });
+});
+
+// Testa se o Chromium consegue iniciar no servidor.
+app.get('/api/flow/browser-check', async (_req, res) => {
+  let browser;
+
+  try {
+    browser = await chromium.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-dev-shm-usage'
+      ]
+    });
+
+    const version = browser.version();
+
+    const page = await browser.newPage();
+    await page.goto('about:blank');
+
+    const title = await page.title();
+
+    await browser.close();
+    browser = null;
+
+    res.json({
+      ok: true,
+      browser: 'Chromium',
+      version,
+      pageOpened: true,
+      pageTitle: title,
+      message: 'O navegador iniciou e abriu uma página de teste.'
+    });
+  } catch (error) {
+    if (browser) {
+      await browser.close().catch(() => {});
+    }
+
+    console.error('Falha no teste Chromium:', error.message);
+
+    res.status(500).json({
+      ok: false,
+      browser: 'Chromium',
+      error: String(error.message || 'Falha ao iniciar navegador').slice(0, 700)
+    });
+  }
 });
 
 // Recebe a chave Gemini pelo próprio aplicativo.
@@ -216,8 +262,7 @@ async function generateScene(project, scene) {
       );
     }
 
-    const filename =
-      `${project.id}_${scene.id}.mp4`;
+    const filename = `${project.id}_${scene.id}.mp4`;
 
     await fs.writeFile(
       path.join(VIDEOS, filename),
