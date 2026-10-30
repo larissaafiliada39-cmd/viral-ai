@@ -1,5 +1,5 @@
-
 import 'dotenv/config';
+
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -14,8 +14,8 @@ import { spawn } from 'node:child_process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
 
-// Usa uma pasta temporária gravável para os dados.
-const DATA = '/tmp/viral-ai-data';
+// Pasta temporária gravável para os dados do aplicativo.
+const DATA = process.env.DATA_DIR || '/tmp/viral-ai-data';
 const VIDEOS = path.join(DATA, 'videos');
 const JOBS_FILE = path.join(DATA, 'jobs.json');
 
@@ -24,7 +24,10 @@ const MODEL = process.env.MODEL || 'gemini-omni-1.1-flash';
 
 const app = express();
 
-await fs.mkdir(DATA, { recursive: true });
+// A chave cadastrada pelo aplicativo fica somente na memória do servidor.
+// Ela não é gravada no navegador nem em arquivo.
+let runtimeGeminiKey = '';
+
 await fs.mkdir(VIDEOS, { recursive: true });
 
 let jobs = {};
@@ -39,21 +42,31 @@ const persist = async () => {
   await fs.writeFile(JOBS_FILE, JSON.stringify(jobs, null, 2));
 };
 
-const hasKey = () =>
-  Boolean(
-    process.env.GEMINI_API_KEY &&
-    process.env.GEMINI_API_KEY !== 'cole_sua_chave_aqui'
-  );
+const getGeminiKey = () =>
+  runtimeGeminiKey ||
+  (process.env.GEMINI_API_KEY &&
+   process.env.GEMINI_API_KEY !== 'cole_sua_chave_aqui'
+    ? process.env.GEMINI_API_KEY
+    : '');
+
+const hasKey = () => Boolean(getGeminiKey());
 
 const ai = () => {
-  if (!hasKey()) throw new Error('GEMINI_KEY_MISSING');
-  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const key = getGeminiKey();
+
+  if (!key) {
+    throw new Error('GEMINI_KEY_MISSING');
+  }
+
+  return new GoogleGenAI({ apiKey: key });
 };
 
-const safeName = s =>
-  String(s).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 80);
+const safeName = value =>
+  String(value).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 80);
 
-app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
 
 app.use(cors({
   origin: process.env.APP_ORIGIN
@@ -70,11 +83,7 @@ app.use('/api/', rateLimit({
   legacyHeaders: false
 }));
 
-app.get('/', (_req, res) => {
-  res.sendFile(path.join(ROOT, 'index.html'));
-});
-
-app.use(express.static(path.join(ROOT, 'public')));
+app.use(express.static(ROOT));
 
 app.get('/api/status', (_req, res) => {
   res.json({
@@ -83,6 +92,32 @@ app.get('/api/status', (_req, res) => {
     model: MODEL,
     keyConfigured: hasKey(),
     setupUrl: 'https://aistudio.google.com/api-keys'
+  });
+});
+
+// Recebe a chave enviada pela janela de configuração do VIRAL AI.
+// A chave não é devolvida na resposta e não é registrada em logs.
+app.post('/api/settings/gemini-key', (req, res) => {
+  const apiKey = String(req.body?.apiKey || '').trim();
+
+  if (!apiKey) {
+    return res.status(400).json({
+      error: 'Cole uma chave Gemini válida.'
+    });
+  }
+
+  if (apiKey.length > 500) {
+    return res.status(400).json({
+      error: 'A chave informada é inválida.'
+    });
+  }
+
+  runtimeGeminiKey = apiKey;
+
+  return res.json({
+    ok: true,
+    keyConfigured: true,
+    message: 'Chave recebida pelo servidor. Ela ficará disponível até o servidor reiniciar.'
   });
 });
 
@@ -102,38 +137,51 @@ app.get('/api/projects', (_req, res) => {
 });
 
 app.get('/api/projects/:id', (req, res) => {
-  const j = jobs[req.params.id];
+  const job = jobs[req.params.id];
 
-  if (!j) {
-    return res.status(404).json({ error: 'Projeto não encontrado.' });
+  if (!job) {
+    return res.status(404).json({
+      error: 'Projeto não encontrado.'
+    });
   }
 
-  res.json(j);
+  res.json(job);
 });
 
 app.post('/api/projects', async (req, res) => {
-  const { title, scenes, aspectRatio = '9:16' } = req.body || {};
+  const {
+    title,
+    scenes,
+    aspectRatio = '9:16'
+  } = req.body || {};
 
-  if (!title || !Array.isArray(scenes) || scenes.length < 1 || scenes.length > 40) {
+  if (
+    !title ||
+    !Array.isArray(scenes) ||
+    scenes.length < 1 ||
+    scenes.length > 40
+  ) {
     return res.status(400).json({
       error: 'Informe título e de 1 a 40 cenas.'
     });
   }
 
   if (!['9:16', '16:9'].includes(aspectRatio)) {
-    return res.status(400).json({ error: 'Proporção inválida.' });
+    return res.status(400).json({
+      error: 'Proporção inválida.'
+    });
   }
 
-  const normalized = scenes.map((s, i) => ({
+  const normalized = scenes.map((scene, index) => ({
     id: nanoid(8),
-    number: i + 1,
-    prompt: String(s.prompt || '').trim().slice(0, 12000),
+    number: index + 1,
+    prompt: String(scene.prompt || '').trim().slice(0, 12000),
     status: 'pending',
     videoUrl: null,
     error: null
   }));
 
-  if (normalized.some(s => !s.prompt)) {
+  if (normalized.some(scene => !scene.prompt)) {
     return res.status(400).json({
       error: 'Cada cena precisa de um prompt.'
     });
@@ -152,12 +200,14 @@ app.post('/api/projects', async (req, res) => {
   };
 
   await persist();
+
   res.status(201).json(jobs[id]);
 });
 
 async function generateScene(project, scene) {
   scene.status = 'generating';
   scene.error = null;
+
   await persist();
 
   try {
@@ -174,7 +224,9 @@ async function generateScene(project, scene) {
     const b64 = interaction.output_video?.data;
 
     if (!b64) {
-      throw new Error('O Gemini não retornou um arquivo de vídeo nesta resposta.');
+      throw new Error(
+        'O Gemini não retornou um arquivo de vídeo nesta resposta.'
+      );
     }
 
     const filename =
@@ -187,18 +239,18 @@ async function generateScene(project, scene) {
 
     scene.status = 'completed';
     scene.videoUrl = `/media/${filename}`;
-  } catch (e) {
+
+  } catch (error) {
     scene.status = 'error';
+
     scene.error =
-      e.message === 'GEMINI_KEY_MISSING'
+      error.message === 'GEMINI_KEY_MISSING'
         ? 'A chave Gemini ainda não foi configurada no servidor.'
-        : String(e.message || 'Falha na geração').slice(0, 500);
+        : String(error.message || 'Falha na geração').slice(0, 500);
   }
 
   await persist();
-}
-
-async function runProject(id) {
+}async function runProject(id) {
   const project = jobs[id];
 
   project.status = 'generating';
@@ -211,17 +263,21 @@ async function runProject(id) {
   }
 
   project.status = project.scenes.every(
-    s => s.status === 'completed'
-  ) ? 'completed' : 'needs_attention';
+    scene => scene.status === 'completed'
+  )
+    ? 'completed'
+    : 'needs_attention';
 
   await persist();
 }
 
 app.post('/api/projects/:id/generate', async (req, res) => {
-  const p = jobs[req.params.id];
+  const project = jobs[req.params.id];
 
-  if (!p) {
-    return res.status(404).json({ error: 'Projeto não encontrado.' });
+  if (!project) {
+    return res.status(404).json({
+      error: 'Projeto não encontrado.'
+    });
   }
 
   if (!hasKey()) {
@@ -231,91 +287,114 @@ app.post('/api/projects/:id/generate', async (req, res) => {
     });
   }
 
-  if (p.status === 'generating') {
+  if (project.status === 'generating') {
     return res.status(409).json({
       error: 'Este projeto já está em geração.'
     });
   }
 
-  p.status = 'queued';
+  project.status = 'queued';
   await persist();
 
   res.json({
     accepted: true,
-    projectId: p.id,
-    status: p.status
+    projectId: project.id,
+    status: project.status
   });
 
-  setImmediate(() => runProject(p.id));
+  setImmediate(() => runProject(project.id));
 });
 
-app.post('/api/projects/:id/scenes/:sceneId/regenerate', async (req, res) => {
-  const p = jobs[req.params.id];
-  const s = p?.scenes.find(x => x.id === req.params.sceneId);
+app.post(
+  '/api/projects/:id/scenes/:sceneId/regenerate',
+  async (req, res) => {
+    const project = jobs[req.params.id];
 
-  if (!p || !s) {
-    return res.status(404).json({
-      error: 'Projeto ou cena não encontrado.'
-    });
-  }
+    const scene = project?.scenes.find(
+      item => item.id === req.params.sceneId
+    );
 
-  if (!hasKey()) {
-    return res.status(409).json({
-      error: 'GEMINI_KEY_MISSING',
-      setupUrl: 'https://aistudio.google.com/api-keys'
-    });
-  }
+    if (!project || !scene) {
+      return res.status(404).json({
+        error: 'Projeto ou cena não encontrado.'
+      });
+    }
 
-  if (p.status === 'generating') {
-    return res.status(409).json({
-      error: 'Aguarde a geração atual terminar.'
-    });
-  }
+    if (!hasKey()) {
+      return res.status(409).json({
+        error: 'GEMINI_KEY_MISSING'
+      });
+    }
 
-  if (req.body?.prompt) {
-    s.prompt = String(req.body.prompt).slice(0, 12000);
-  }
+    if (project.status === 'generating') {
+      return res.status(409).json({
+        error: 'Aguarde a geração atual terminar.'
+      });
+    }
 
-  p.status = 'generating';
-  s.status = 'pending';
-  await persist();
+    if (req.body?.prompt) {
+      scene.prompt = String(req.body.prompt).slice(0, 12000);
+    }
 
-  res.json({ accepted: true, sceneId: s.id });
-
-  setImmediate(async () => {
-    await generateScene(p, s);
-
-    p.status = p.scenes.every(
-      x => x.status === 'completed'
-    ) ? 'completed' : 'needs_attention';
+    project.status = 'generating';
+    scene.status = 'pending';
 
     await persist();
-  });
-});
+
+    res.json({
+      accepted: true,
+      sceneId: scene.id
+    });
+
+    setImmediate(async () => {
+      await generateScene(project, scene);
+
+      project.status = project.scenes.every(
+        item => item.status === 'completed'
+      )
+        ? 'completed'
+        : 'needs_attention';
+
+      await persist();
+    });
+  }
+);
 
 function ffmpegConcat(files, output) {
   return new Promise((resolve, reject) => {
-    const list = path.join(DATA, `concat_${nanoid(8)}.txt`);
+    const list = path.join(
+      DATA,
+      `concat_${nanoid(8)}.txt`
+    );
 
     fs.writeFile(
       list,
-      files.map(f => `file '${f.replaceAll("'", "'\\''")}'`).join('\n')
+      files.map(file =>
+        `file '${file.replaceAll("'", "'\\''")}'`
+      ).join('\n')
     ).then(() => {
+
       const child = spawn('ffmpeg', [
         '-y',
-        '-f', 'concat',
-        '-safe', '0',
-        '-i', list,
-        '-c:v', 'libx264',
-        '-c:a', 'aac',
-        '-movflags', '+faststart',
+        '-f',
+        'concat',
+        '-safe',
+        '0',
+        '-i',
+        list,
+        '-c:v',
+        'libx264',
+        '-c:a',
+        'aac',
+        '-movflags',
+        '+faststart',
         output
       ]);
 
-      let err = '';
+      let errorOutput = '';
 
-      child.stderr.on('data', d => {
-        err += d.toString();
+      child.stderr.on('data', data => {
+        errorOutput += data.toString();
       });
 
       child.on('close', async code => {
@@ -324,60 +403,85 @@ function ffmpegConcat(files, output) {
         if (code === 0) {
           resolve();
         } else {
-          reject(new Error(err.slice(-1200) || 'Falha no FFmpeg'));
+          reject(
+            new Error(
+              errorOutput.slice(-1200) ||
+              'Falha no FFmpeg.'
+            )
+          );
         }
       });
 
       child.on('error', reject);
+
     }).catch(reject);
   });
 }
 
 app.post('/api/projects/:id/merge', async (req, res) => {
-  const p = jobs[req.params.id];
+  const project = jobs[req.params.id];
 
-  if (!p) {
-    return res.status(404).json({ error: 'Projeto não encontrado.' });
+  if (!project) {
+    return res.status(404).json({
+      error: 'Projeto não encontrado.'
+    });
   }
 
-  if (p.status === 'generating' || p.scenes.some(s => s.status !== 'completed')) {
+  if (
+    project.status === 'generating' ||
+    project.scenes.some(scene => scene.status !== 'completed')
+  ) {
     return res.status(409).json({
       error: 'Todas as cenas precisam estar concluídas antes da montagem.'
     });
   }
 
-  const files = p.scenes.map(
-    s => path.join(VIDEOS, path.basename(s.videoUrl))
+  const files = project.scenes.map(scene =>
+    path.join(VIDEOS, path.basename(scene.videoUrl))
   );
 
-  const outputName = `${safeName(p.id)}_final.mp4`;
+  const outputName = `${safeName(project.id)}_final.mp4`;
   const output = path.join(VIDEOS, outputName);
 
   try {
     await ffmpegConcat(files, output);
 
-    p.finalUrl = `/media/${outputName}`;
-    p.status = 'completed';
+    project.finalUrl = `/media/${outputName}`;
+    project.status = 'completed';
 
     await persist();
 
-    res.json({ ok: true, finalUrl: p.finalUrl });
-  } catch (e) {
+    res.json({
+      ok: true,
+      finalUrl: project.finalUrl
+    });
+
+  } catch (error) {
     res.status(500).json({
-      error: `Não foi possível unir os clipes: ${e.message}`
+      error: `Não foi possível unir os clipes: ${error.message}`
     });
   }
 });
 
-app.use('/media', express.static(VIDEOS, {
-  fallthrough: false,
-  setHeaders: r =>
-    r.setHeader('Cache-Control', 'private, max-age=3600')
-}));
+app.use(
+  '/media',
+  express.static(VIDEOS, {
+    fallthrough: false,
+    setHeaders: response => {
+      response.setHeader(
+        'Cache-Control',
+        'private, max-age=3600'
+      );
+    }
+  })
+);
 
-app.use((err, _req, res, _next) => {
-  console.error(err);
-  res.status(500).json({ error: 'Erro interno no servidor.' });
+app.use((error, req, res, next) => {
+  console.error('Erro no servidor:', error.message);
+
+  res.status(500).json({
+    error: 'Erro interno no servidor.'
+  });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
