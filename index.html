@@ -1,165 +1,717 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#171324"><title>VIRAL AI — Estúdio de criação</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10101b">
+<title>VIRAL AI</title>
 <style>
-:root{--bg:#0d0b14;--panel:#171324;--panel2:#211b31;--line:#332b45;--text:#f8f6ff;--muted:#b8aecb;--purple:#a855f7;--pink:#ec4899;--green:#86efac}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#25143c 0,#0d0b14 55%);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
-.wrap{max-width:1000px;margin:auto;padding:18px 14px 90px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}.brand{display:flex;gap:12px;align-items:center}.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,var(--purple),var(--pink));display:grid;place-items:center;font-size:25px}h1{font-size:20px;letter-spacing:.08em;margin:0}.sub,.small,.muted{color:var(--muted);font-size:12px}.pill{border:1px solid #496b56;color:var(--green);padding:5px 10px;border-radius:99px;font-size:11px}
-.hero,.card{background:#171324ed;border:1px solid var(--line);border-radius:20px;padding:19px;margin-bottom:15px}.hero{background:linear-gradient(125deg,#281b3d,#171324 68%);padding:22px}.hero h2{font-size:clamp(25px,5vw,36px);line-height:1.12;margin:0 0 8px}.hero p{margin:0;color:var(--muted)}
-h3{font-size:17px;margin:0 0 13px}.tabs{display:flex;gap:8px;overflow:auto;margin:16px 0}.tab,.chip{border:1px solid var(--line);background:var(--panel);color:var(--muted);padding:10px 14px;border-radius:12px;cursor:pointer;white-space:nowrap}.tab.active,.chip.active{background:#39224f;color:white;border-color:#8050a9}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{margin:12px 0}label{display:block;font-size:13px;color:#ddd4ec;margin-bottom:6px}input,textarea,select{width:100%;border:1px solid var(--line);border-radius:12px;background:#0f0c18;color:var(--text);padding:12px;font:inherit}textarea{min-height:90px;resize:vertical}button{font:inherit;cursor:pointer}.primary{width:100%;border:0;border-radius:13px;padding:13px;color:white;font-weight:700;background:linear-gradient(100deg,var(--purple),var(--pink));margin-top:8px}.secondary{border:1px solid var(--line);border-radius:11px;background:var(--panel2);color:white;padding:9px 12px}.danger{border-color:#713c57;color:#ffc4d7}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.hidden{display:none!important}.notice{font-size:12px;color:#c8b9dc;margin:12px 0}.output{white-space:pre-wrap;color:#eee8f7;font-size:13px;line-height:1.65}.empty{border:1px dashed #55466a;border-radius:14px;padding:20px;text-align:center;color:var(--muted)}.scene{border:1px solid var(--line);border-radius:14px;padding:13px;margin:10px 0;background:#100d19}.scene-head{display:flex;justify-content:space-between;gap:8px;align-items:center}.scene b{color:#d8b4fe}.scene textarea{min-height:75px;margin-top:8px}.tag{font-size:11px;color:#c4b5fd;border:1px solid #51416b;border-radius:30px;padding:3px 8px}.module-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.module{border:1px solid var(--line);background:#100d19;border-radius:14px;padding:13px;text-align:left;color:white}.module strong{display:block;margin:4px 0}.module span{font-size:12px;color:var(--muted)}.step{display:flex;gap:10px;align-items:flex-start;margin:10px 0}.num{background:#39224f;border-radius:50%;width:26px;height:26px;display:grid;place-items:center;flex:none}.check{color:var(--green)}footer{text-align:center;color:#80758f;font-size:11px;margin-top:24px}
-@media(max-width:700px){.grid{grid-template-columns:1fr}.wrap{padding:14px 11px 70px}.card{padding:15px}.module-grid{grid-template-columns:1fr 1fr}}
-</style></head>
-<body><div class="wrap">
-<header class="top"><div class="brand"><div class="logo">⚡</div><div><h1>VIRAL AI</h1><div class="sub">SEU ESTÚDIO DE CRIAÇÃO</div></div></div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end"><span class="pill">GEMINI VIDEO API • PREPARAÇÃO</span><span class="pill">BACKEND GEMINI • v0.6</span></div></header>
-<section class="hero"><h2>Da ideia ao vídeo final.</h2><p>Crie novelas em episódios, animações, histórias, conteúdo bíblico e vídeos UGC para TikTok e lojas.</p></section>
-<nav class="tabs"><button class="tab active" data-tab="create">✦ Criar</button><button class="tab" data-tab="production">🎬 Produção</button><button class="tab" data-tab="projects">▣ Projetos</button><button class="tab" data-tab="guide">↗ Como funciona</button></nav>
-
+:root{--bg:#0b0b13;--panel:#151522;--panel2:#1d1d2d;--line:#303047;--txt:#f5f4fb;--muted:#aaa8bd;--pink:#ff4fa3;--purple:#9b7bff;--green:#52d6a0;--red:#ff737d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top right,#251638 0,#0b0b13 38%);color:var(--txt);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer;border:0;border-radius:11px;padding:11px 15px;background:linear-gradient(110deg,var(--pink),var(--purple));color:white;font-weight:700}button.secondary{background:var(--panel2);border:1px solid var(--line);color:var(--txt)}button.danger{background:#54212b}.wrap{max-width:1180px;margin:auto;padding:22px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}.brand{font-size:27px;font-weight:900;letter-spacing:1px}.brand span{color:var(--pink)}.sub,.small,.muted{color:var(--muted)}.tabs{display:flex;gap:8px;overflow:auto;padding:5px 0 14px}.tab{white-space:nowrap;background:var(--panel);border:1px solid var(--line);color:var(--muted)}.tab.active{background:#352044;color:white;border-color:#8c55a9}.panel{background:rgba(21,21,34,.96);border:1px solid var(--line);border-radius:17px;padding:20px;margin:12px 0;box-shadow:0 12px 35px #0003}.hidden{display:none!important}h1,h2,h3{margin:0 0 10px}h1{font-size:25px}h2{font-size:20px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field{display:flex;flex-direction:column;gap:6px;margin:10px 0}.field label{font-weight:700}.field input,.field textarea,.field select,.scene textarea{width:100%;background:#0e0e18;border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:11px;outline:none}.field textarea{min-height:95px;resize:vertical}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.output{white-space:pre-wrap;background:#0e0e18;border:1px solid var(--line);padding:15px;border-radius:12px;min-height:80px;overflow-wrap:anywhere}.studio-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:9px}.studio{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:left;color:var(--txt)}.studio.selected{border-color:var(--pink);background:#382039}.scene{background:#11111c;border:1px solid var(--line);border-radius:12px;padding:13px;margin:12px 0}.scene-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.tag{color:#ffc2df;font-size:12px}.status{padding:11px;border-radius:10px;background:#10101a;border:1px solid var(--line);margin-top:10px;white-space:pre-wrap}.good{color:var(--green)}.bad{color:var(--red)}.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:18px;z-index:20}.modal.show{display:flex}.dialog{width:min(520px,100%);background:#191927;border:1px solid #48405b;border-radius:18px;padding:22px;box-shadow:0 20px 70px #0009}.dialog input{width:100%;padding:13px;border-radius:10px;background:#0b0b13;border:1px solid var(--line);color:white;margin:8px 0 12px}.notice{font-size:13px;color:var(--muted);background:#222033;padding:11px;border-radius:10px}.empty{color:var(--muted);padding:15px}.video{width:100%;max-height:230px;margin-top:8px;border-radius:10px;background:#000}a{color:#ff9dce}@media(max-width:700px){.wrap{padding:13px}.grid{grid-template-columns:1fr}.panel{padding:15px}.brand{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><div><div class="brand">VIRAL <span>AI</span></div><div class="sub">Sua central de criação de conteúdo</div></div><button class="secondary" id="openKeyModal">⚙ Configurar Gemini</button></header>
+<nav class="tabs">
+<button class="tab active" data-tab="create">Criar projeto</button><button class="tab" data-tab="production">Produção</button><button class="tab" data-tab="projects">Meus projetos</button><button class="tab" data-tab="guide">Ajuda</button>
+</nav>
+<main>
 <section id="create">
-<div class="card"><h3>① Escolha seu estúdio</h3><div class="module-grid" id="modules">
-<button class="module" data-kind="novela"><strong>🍓 Novelas de frutas</strong><span>Romance, traição, comédia e drama</span></button>
-<button class="module" data-kind="soap"><strong>🎭 Novelas tradicionais</strong><span>Personagens humanos, famílias e conflitos</span></button>
-<button class="module" data-kind="dorama"><strong>🇰🇷 Doramas</strong><span>Romance, drama, amizade e reviravoltas</span></button>
-<button class="module" data-kind="kids"><strong>🐧 Desenhos infantis</strong><span>Séries animadas, aventuras e educação</span></button>
-<button class="module" data-kind="movie"><strong>🎬 Filmes infantis</strong><span>Histórias longas com começo, meio e fim</span></button>
-<button class="module" data-kind="song"><strong>🎵 Músicas infantis</strong><span>Letra, melodia-guia, cenas e clipe musical</span></button>
-<button class="module" data-kind="bible"><strong>📖 Bíblia em imagens</strong><span>Passagem, reflexão e imagem com texto</span></button>
-<button class="module" data-kind="reddit"><strong>💬 Histórias Reddit</strong><span>Relatos, drama, suspense e histórias completas</span></button>
-<button class="module" data-kind="motivation"><strong>✨ Motivacional</strong><span>Frases, narração e cenas inspiradoras</span></button>
-<button class="module" data-kind="ugc"><strong>🛍️ UGC / TikTok Shop</strong><span>Apresentação de produtos e demonstrações</span></button>
-<button class="module" data-kind="photo"><strong>👗 Provador com IA</strong><span>Looks, troca de roupa e demonstração no corpo</span></button>
-<button class="module" data-kind="product"><strong>📦 Vídeo de produto</strong><span>Unboxing, detalhes, uso e chamada de compra</span></button>
-</div><p class="notice">Depois de escolher uma automação, você pode criar o roteiro aqui e abrir seus projetos do Google Flow pelo botão no topo ou na Central de Produção.</p></div>
+<div class="panel"><h1>Escolha seu estúdio</h1><p class="muted">Selecione o tipo de conteúdo que deseja criar.</p><div class="studio-grid" id="studioGrid"></div></div>
+<div class="panel"><h2>Detalhes do projeto</h2>
 <div class="grid">
-<div class="card"><h3>② Monte seu projeto</h3>
-<div class="field"><label for="title">Nome do projeto</label><input id="title" placeholder="Ex.: A traição do Morango"></div>
-<div class="field"><label for="idea">Ideia / tema / passagem / produto</label><textarea id="idea" placeholder="Conte o que você quer criar..."></textarea></div>
-<div id="novelaFields">
-<div class="field"><label for="cast">Personagens e características fixas</label><textarea id="cast" placeholder="Morango: protagonista, vestido vermelho, voz doce. Banana: namorado, jaqueta azul..."></textarea></div>
-<div class="field"><label for="setting">Universo e cenário fixo</label><input id="setting" placeholder="Cidade das Frutas, visual 3D de animação..."></div>
+<div class="field"><label for="title">Nome do projeto</label><input id="title" placeholder="Ex.: A novela da fruta"></div>
+<div class="field"><label for="duration">Duração total (segundos)</label><input id="duration" type="number" min="10" max="600" value="60"></div>
+<div class="field"><label for="style">Estilo visual</label><select id="style"><option>3D colorido estilo animação infantil</option><option>Fotorealista cinematográfico</option><option>Dorama cinematográfico</option><option>Novela dramática realista</option><option>Cartoon 2D original</option><option>UGC / vídeo de celular natural</option><option>Documental</option></select></div>
+<div class="field"><label for="platform">Plataforma</label><select id="platform"><option>YouTube Shorts</option><option>TikTok</option><option>Instagram Reels</option><option>YouTube</option><option>TikTok Shop / Shopee</option></select></div>
 </div>
-<div id="ugcFields" class="hidden">
-<div class="field"><label for="productName">Nome do produto</label><input id="productName" placeholder="Ex.: vestido midi floral"></div>
-<div class="field"><label for="features">Detalhes reais do produto</label><textarea id="features" placeholder="Tecido, tamanho, caimento, material, benefícios confirmados..."></textarea></div>
-<div class="field"><label for="platform">Plataforma</label><select id="platform"><option>TikTok Shop</option><option>Shopee Vídeo</option><option>Instagram Reels</option><option>UGC genérico</option></select></div>
+<div class="field"><label for="idea">Ideia ou tema</label><textarea id="idea" placeholder="Conte o que acontece no vídeo, a mensagem ou a história..."></textarea></div>
+<div class="grid">
+<div class="field"><label for="cast">Personagens / apresentador</label><textarea id="cast" placeholder="Nomes, aparência, personalidade e voz..."></textarea></div>
+<div class="field"><label for="setting">Cenário principal</label><textarea id="setting" placeholder="Descreva o cenário e objetos importantes..."></textarea></div>
+<div class="field"><label for="product">Produto (se houver)</label><input id="product" placeholder="Nome do produto"></div>
+<div class="field"><label for="features">Características confirmadas do produto</label><textarea id="features" placeholder="Não invente características; informe apenas as confirmadas."></textarea></div>
 </div>
-<div id="bibleFields" class="hidden"><div class="field"><label for="translation">Tradução bíblica preferida (se souber)</label><input id="translation" placeholder="Ex.: Almeida Revista e Corrigida"></div></div>
-<div class="field"><label for="duration">Duração total desejada</label><select id="duration"><option value="30">30 segundos</option><option value="60" selected>1 minuto</option><option value="90">1 minuto e 30</option><option value="120">2 minutos</option><option value="180">3 minutos</option><option value="300">5 minutos</option><option value="600">10 minutos</option><option value="900">15 minutos</option><option value="1800">30 minutos</option></select></div>
-<div class="field"><label for="style">Estilo visual / tom</label><select id="style"><option>3D cinematográfico</option><option>Desenho 2D colorido</option><option>Realista / UGC de celular</option><option>Novela dramática</option><option>Fofo e educativo</option><option>Emocionante e inspirador</option></select></div>
-<button class="primary" id="makeScript">✦ Gerar roteiro completo</button><p class="notice">Nesta versão, o protótipo organiza roteiros e prompts localmente. A conexão automática ao Flow, geração real de vídeo e renderização exigem integração técnica e serviços externos.</p>
+<div class="actions"><button id="makeScript">✨ Criar roteiro-base</button><button class="secondary" id="toProduction">Criar cenas de 10 segundos</button></div>
+<div id="scriptResult" class="output hidden"></div>
+<div class="actions hidden" id="scriptActions"><button class="secondary" id="copyScript">Copiar roteiro</button><button class="secondary" id="saveProject">Salvar projeto</button></div>
 </div>
-<div class="card"><h3>③ Seu roteiro</h3><div id="scriptResult" class="empty">Escolha um estúdio, descreva sua ideia e gere o roteiro.</div><div class="actions hidden" id="scriptActions"><button class="secondary" id="copyScript">Copiar roteiro</button><button class="secondary" id="toProduction">Criar cenas de 10 s →</button><button class="secondary" id="saveProject">Salvar projeto</button></div></div>
-</div></section>
-
+</section>
 <section id="production" class="hidden">
-<div class="card"><h3>🎬 Central de produção</h3><p class="small">Cada cena é preparada para geração por API. O Gemini Omni Flash aceita clipes curtos de 3 a 10 segundos; cenas longas serão divididas em tomadas menores.</p>
-<div id="continuity" class="scene"><b>Ficha de continuidade</b><p class="small">Gere um roteiro primeiro para criar as cenas.</p></div>
-<div id="sceneList" class="empty">Nenhuma cena criada ainda.</div>
-<div class="card" style="margin-top:14px;background:#211b31"><h3>☁️ Conexão com Gemini Video API</h3><p class="small">Ainda não cadastrou a chave? O VIRAL AI vai orientar você. A chave é guardada como segredo no servidor — não cole sua chave nesta tela nem em conversas.</p>
-<div class="step"><span class="num">1</span><div><b>Abrir Google AI Studio</b><div class="small">Entre com sua conta Google e acesse a página oficial de chaves.</div><div class="actions"><button class="primary" id="getGeminiKey">🔑 Criar / obter minha chave</button></div></div></div>
-<div class="step"><span class="num">2</span><div><b>Criar ou selecionar um projeto</b><div class="small">No AI Studio, use “Create API key” e escolha o projeto. Se for solicitado, configure faturamento e confira os limites e preços antes de gerar vídeos.</div></div></div>
-<div class="step"><span class="num">3</span><div><b>Guardar a chave no servidor</b><div class="small">Na implantação do VIRAL AI, adicione a chave como variável secreta <code>GEMINI_API_KEY</code>. Nunca dentro do HTML, do navegador ou do ZIP.</div></div></div>
-<div class="step"><span class="num">4</span><div><b>Conectar o servidor ao aplicativo</b><div class="small">Depois que o backend estiver implantado, cole aqui somente o endereço HTTPS dele.</div></div></div>
-<div class="field"><label for="apiBase">Endereço HTTPS do servidor VIRAL AI</label><input id="apiBase" placeholder="https://api.seudominio.com"></div><div class="actions"><button class="secondary" id="checkApi">Testar conexão</button><span id="apiStatus" class="tag">Backend não conectado</span></div>
-<p class="notice">A chave criada no AI Studio não ativa sozinha a geração. É necessário concluir a implantação do backend seguro, armazenamento e renderizador FFmpeg. Modelo planejado: gemini-omni-1.1-flash; confirme a disponibilidade do modelo e os custos na sua conta antes da produção.</p><div class="actions"><button class="secondary" id="keyHelp">Ver instruções de segurança da chave</button></div></div>
-<div class="actions"><button class="primary" id="generateGemini">🚀 Gerar cenas no Gemini</button><button class="secondary" id="mergeGemini">🎞️ Unir cenas em MP4</button></div><div id="geminiJobStatus" class="notice">Conecte o backend para ativar a geração real.</div><div class="actions"><button class="secondary" id="copyAll">Copiar todos os prompts</button><button class="secondary" id="downloadPrompts">Baixar prompts .txt</button><button class="primary" id="assemble">Preparar montagem final</button></div>
-<div class="card"><h3>📥 Clipes gerados / importados</h3><p class="small">Quando o backend estiver ativo, os vídeos aparecerão aqui. Por enquanto, você pode importar arquivos para organizar a montagem localmente.</p><input id="clipFiles" type="file" accept="video/*" multiple><div id="clipList" class="notice">Nenhum clipe importado.</div><button class="secondary" id="clearClips">Limpar lista</button></div>
-<div id="assembly" class="notice"></div>
-</div></section>
-
-<section id="projects" class="hidden"><div class="card"><h3>▣ Projetos salvos neste dispositivo</h3><div id="projectList" class="empty">Nenhum projeto salvo.</div></div></section>
-<section id="guide" class="hidden"><div class="card"><h3>Como será o fluxo completo</h3>
-<div class="step"><span class="num">1</span><div><b>Gerar roteiro</b><div class="small">O VIRAL AI cria a história inteira, personagens, falas e final.</div></div></div>
-<div class="step"><span class="num">2</span><div><b>Gerar cenas de 10 segundos</b><div class="small">Divide automaticamente o roteiro em clipes curtos e numerados.</div></div></div>
-<div class="step"><span class="num">3</span><div><b>Gerar pela Gemini Video API</b><div class="small">O backend seguro enviará as cenas ao Gemini Omni Flash e acompanhará cada tarefa.</div></div></div>
-<div class="step"><span class="num">4</span><div><b>Editar cada parte</b><div class="small">Altere falas e prompts de qualquer cena antes de gerar novamente.</div></div></div>
-<div class="step"><span class="num">5</span><div><b>Unir e exportar MP4</b><div class="small">O renderizador no servidor (FFmpeg) juntará os clipes na ordem, com opção de transições, áudio e formato final.</div></div></div>
-<p class="notice">Esta versão é a interface de preparação. Ainda não existe um servidor implantado nem geração real ativa. A integração requer backend HTTPS, chave Gemini guardada como segredo, armazenamento de vídeos e FFmpeg para montagem.</p>
-</div></section>
-<footer>VIRAL AI • v0.6 — integração inicial • Assistente de configuração Gemini</footer></div>
+<div class="panel"><h1>Produção do vídeo</h1><p class="muted">Revise cada cena, gere pelo backend configurado e acompanhe o andamento.</p><div id="continuity" class="status">Crie um roteiro e as cenas primeiro.</div><div id="sceneList"></div>
+<div class="actions"><button class="secondary" id="copyAll">Copiar todos os prompts</button><button class="secondary" id="downloadPrompts">Baixar prompts (.txt)</button><button id="generateGemini">Gerar com Gemini</button><button class="secondary" id="mergeGemini">Unir MP4 gerado</button></div><div id="geminiJobStatus" class="status">Aguardando ação.</div></div>
+<div class="panel"><h2>Importar clipes externos</h2><p class="muted">Você pode selecionar clipes baixados do Flow para visualizar e organizar. A união automática depende do backend e dos arquivos enviados a ele.</p><input id="clipFiles" type="file" accept="video/*" multiple><div id="clipList"></div><div class="actions"><button class="secondary" id="clearClips">Limpar clipes</button></div><div id="assembly" class="status">Nenhum vídeo montado.</div></div>
+<div class="panel"><h2>Conexão com o servidor</h2><div class="field"><label for="apiBase">Endereço HTTPS do backend</label><input id="apiBase" type="url" value="https://viral-ai.hostless.app"></div><div class="actions"><button class="secondary" id="checkApi">Testar conexão</button><button class="secondary" id="openKeyModal2">Cadastrar chave Gemini</button><button class="secondary" id="getGeminiKey">Obter chave no Google AI Studio</button></div><div id="apiStatus" class="status">Servidor ainda não testado.</div></div>
+</section>
+<section id="projects" class="hidden"><div class="panel"><h1>Meus projetos</h1><div id="projectList" class="empty">Nenhum projeto salvo neste dispositivo.</div></div></section>
+<section id="guide" class="hidden"><div class="panel"><h1>Como usar o VIRAL AI</h1><ol><li>Escolha um estúdio e preencha os detalhes do projeto.</li><li>Crie o roteiro-base e revise o texto.</li><li>Crie cenas de até 10 segundos e ajuste os prompts.</li><li>Configure o servidor e cadastre sua chave Gemini pelo botão dentro do aplicativo.</li><li>Use a geração somente quando o backend indicar que a chave está configurada.</li></ol><p class="notice">Este projeto é um protótipo em evolução. A criação de roteiro e prompts é feita localmente no navegador. A geração real de vídeo só funciona se o backend tiver integração compatível com o modelo e a API disponíveis. A chave é enviada ao servidor por HTTPS; a persistência depende da configuração segura de armazenamento no servidor.</p></div></section>
+</main>
+</div><div class="modal" id="keyModal" role="dialog" aria-modal="true" aria-labelledby="keyTitle">
+<div class="dialog">
+<h2 id="keyTitle">Configurar chave Gemini</h2>
+<p class="muted">Cole sua chave do Google AI Studio. Ela será enviada diretamente ao backend por HTTPS.</p>
+<input id="geminiKeyInput" type="password" autocomplete="off" placeholder="Cole sua chave Gemini aqui">
+<div class="notice">Não coloque sua chave em publicações ou mensagens. Esta tela não a salva no navegador. O servidor precisa ter armazenamento seguro configurado para manter a chave após reinicializações.</div>
+<div id="keyStatus" class="status">Aguardando chave.</div>
+<div class="actions">
+<button id="saveKey">Salvar chave no servidor</button>
+<button class="secondary" id="getGeminiKeyModal">Criar/obter chave</button>
+<button class="secondary" id="closeKeyModal">Fechar</button>
+</div>
+</div>
+</div>
 
 <script>
-const $=id=>document.getElementById(id);let kind='novela',project=null,scriptText='',scenes=[];
-const names={novela:'Novelas de frutas',soap:'Novelas tradicionais',dorama:'Doramas',kids:'Desenhos infantis',movie:'Filmes infantis',song:'Músicas infantis',bible:'Bíblia em imagens',reddit:'Histórias Reddit',motivation:'Motivacional',ugc:'UGC / TikTok Shop',photo:'Provador com IA',product:'Vídeo de produto'};
-const defaults={novela:'Uma novela de frutas com personagens fixos, romance, segredo, conflito e reviravolta. Criar episódio com desfecho.',soap:'Uma novela tradicional com personagens humanos originais, relações familiares, romance, conflitos e reviravoltas.',dorama:'Um dorama original com romance emocionante, encontros, desencontros, amizade e reviravolta, sem copiar obras existentes.',kids:'Uma série de desenho infantil com personagens originais, aventura, humor, música e aprendizado adequado para crianças.',movie:'Um filme infantil original, com protagonista, objetivo, aventura, conflito, descoberta e final feliz ou acolhedor.',song:'Criar uma música infantil original, fácil de cantar, com refrão repetitivo, rimas simples, movimentos e cenas para um clipe animado.',bible:'Criar uma imagem inspiradora baseada em uma passagem bíblica, com referência e texto legível.',reddit:'Uma história original em primeira pessoa, com conflito, detalhes, revelação e desfecho completo.',motivation:'Uma mensagem motivacional emocionante com começo forte e conclusão marcante.',ugc:'Criar um vídeo UGC natural apresentando um produto, mostrando detalhes reais e experiência de uso sem inventar benefícios.',photo:'Criar vídeo de provador mostrando o caimento da roupa de frente, de lado e de costas, mantendo o mesmo modelo e a peça.',product:'Vídeo demonstrativo com apresentação, detalhes, uso real e chamada para conhecer o produto.'};
-function setKind(k){kind=k;document.querySelectorAll('.module').forEach(b=>b.classList.toggle('active',b.dataset.kind===k));$('novelaFields').classList.toggle('hidden',!['novela','soap','dorama','kids','movie'].includes(k));$('ugcFields').classList.toggle('hidden',!['ugc','photo','product'].includes(k));$('bibleFields').classList.toggle('hidden',k!=='bible');if(!$('idea').value.trim())$('idea').value=defaults[k];}
-document.querySelectorAll('.module').forEach(b=>b.onclick=()=>setKind(b.dataset.kind));setKind('novela');
-function buildScript(){
-let title=$('title').value.trim()||names[kind],idea=$('idea').value.trim();if(!idea){alert('Descreva sua ideia primeiro.');return}
-let secs=+$('duration').value,cast=$('cast').value.trim(),setting=$('setting').value.trim(),style=$('style').value;
-let product=$('productName').value.trim(),features=$('features').value.trim(),platform=$('platform').value,trans=$('translation').value.trim();
-let hook=kind==='novela'?'“Na Cidade das Frutas, um segredo está prestes a mudar tudo...”':kind==='soap'?'“Naquela família, todos escondiam alguma coisa...”':kind==='dorama'?'“Eles se encontraram por acaso, mas o destino tinha outros planos...”':kind==='movie'?'“Em um mundo cheio de descobertas, uma grande aventura está prestes a começar...”':kind==='song'?'“Bate palma, gira e vem cantar com a gente!”':kind==='reddit'?'“Eu nunca imaginei que descobriria isso dentro da minha própria casa...”':kind==='bible'?'“Uma palavra para fortalecer seu coração hoje.”':kind==='ugc'?'“Olha de perto esse detalhe que eu gostei neste produto.”':'“Você precisa ver como essa história/ideia termina.”';
-let plot=['novela','soap','dorama'].includes(kind)?'ESTRUTURA: apresentação dos protagonistas → situação inicial → relações e conflitos → descoberta/reviravolta → decisão → desfecho do episódio.':kind==='kids'?'ESTRUTURA: apresentação do personagem → pergunta curiosa → tentativa divertida → descoberta → música/recapitulação.':kind==='movie'?'ESTRUTURA DE FILME: apresentação do mundo e protagonista → desejo/objetivo → aventura → obstáculos crescentes → momento decisivo → resolução completa e final satisfatório.':kind==='song'?'ESTRUTURA MUSICAL: introdução curta → verso → refrão marcante e repetível → segundo verso com ações → refrão final. Incluir gestos e movimentos sincronizados com a letra.':kind==='reddit'?'ESTRUTURA: gancho → contexto em primeira pessoa → escalada do conflito → revelação → consequência → desfecho completo, sem depender de parte 2.':kind==='bible'?'ESTRUTURA: referência bíblica → contexto fiel → mensagem principal → aplicação prática → reflexão final. Confirme a tradução e a redação exata do versículo antes de publicar.':kind==='ugc'?'ESTRUTURA: gancho natural → apresentação do produto → demonstração visual → detalhes/benefícios comprováveis → opinião transparente → CTA.':kind==='photo'?'ESTRUTURA: look completo de frente → aproximação do tecido → mão deslizando suavemente sobre a peça → perfil/lateral → costas → volta à frente e CTA.':'ESTRUTURA: gancho → desenvolvimento → exemplo visual → mensagem principal → conclusão e CTA.';
-let bible=kind==='bible'?`\\nTRADUÇÃO/REFERÊNCIA: ${trans||'indicar livro, capítulo e versículo; conferir texto em fonte autorizada'}`:'';
-let ugc=['ugc','photo','product'].includes(kind)?`\\nPRODUTO: ${product||'a definir'}\\nDETALHES INFORMADOS: ${features||'não inventar características não fornecidas'}\\nPLATAFORMA: ${platform}`:'';
-let continuity=['novela','soap','dorama','kids','movie'].includes(kind)?`PERSONAGENS FIXOS: ${cast||'Definir nomes, aparência, roupas, personalidade e voz para cada personagem antes de gerar.'}\\nCENÁRIO FIXO: ${setting||'Definir cenário principal e paleta visual.'}\\nREGRA: não alterar rosto, corpo, cor, roupa, acessórios, voz ou personalidade dos personagens entre cenas, salvo mudança explícita no roteiro.`:'IDENTIDADE VISUAL: manter o mesmo personagem/apresentador, aparência, roupa, voz, produto e estilo visual em todas as cenas.';
-scriptText=`VIRAL AI — ${title.toUpperCase()}\\nESTÚDIO: ${names[kind]}\\nDURAÇÃO: ${secs} segundos | ESTILO: ${style} | FORMATO: vertical 9:16\\n\\nIDEIA: ${idea}\\n\\nGANCHO: ${hook}\\n\\n${plot}\\n\\n${continuity}${bible}${ugc}\\n\\nROTEIRO COMPLETO\\nCriar uma narrativa coerente com falas naturais, ações visuais claras, ritmo adequado à duração e conclusão satisfatória. Não contradizer fatos ou acontecimentos anteriores.\\n\\nENCERRAMENTO / CTA\\nFinalizar com uma frase memorável e convite natural para comentar, seguir ou conhecer o produto, sem promessas enganosas.\\n\\nNOTA: roteiro-base gerado pelo protótipo; revisar falas, fatos, versículos, alegações de produto e direitos de uso antes de publicar.`;
-project={title,kind,idea,secs,cast,setting,style,product,features,platform,continuity,script:scriptText};$('scriptResult').className='output';$('scriptResult').textContent=scriptText;$('scriptActions').classList.remove('hidden');
-}
-function makeScenes(){
-if(!project){alert('Gere um roteiro primeiro.');return}
-let count=Math.ceil(project.secs/10);scenes=[];
-for(let i=0;i<count;i++){
-let start=i*10,end=Math.min((i+1)*10,project.secs),duration=end-start;
-let beat=i===0?'ABERTURA: apresentar a situação e prender a atenção.':i===count-1?'ENCERRAMENTO: concluir a ação e entregar o desfecho prometido.':`CONTINUAÇÃO: avançar a história sem reiniciar. Retomar exatamente do último quadro da cena ${i}.`;
-let prompt=`GEMINI OMNI FLASH — CENA ${String(i+1).padStart(2,'0')} (${start}-${end}s; ${duration}s)\\nPROJETO: ${project.title}\\nCONTINUIDADE FIXA: ${project.continuity}\\nESTILO: ${project.style}; vídeo vertical 9:16, movimento natural, áudio/diálogo em português brasileiro.\\nAÇÃO DESTA CENA: ${beat}\\nCONTEXTO: ${project.idea}\\nINSTRUÇÃO DE CONTINUIDADE: ${i===0?'Estabelecer visualmente os personagens e o cenário que serão mantidos nas próximas cenas.':`Continuação direta da cena ${i}. Começar do estado final da cena anterior. Não reapresentar personagens nem alterar cenário, aparência, roupas, vozes, objetos ou posições sem motivo narrativo.`}\\nEVITAR: mudança de identidade, troca involuntária de roupa, personagens duplicados, cenário incompatível, texto ilegível, cortes que contradigam a cena anterior.\\nREFERÊNCIA: reutilizar no Flow as mesmas imagens/Ingredients dos personagens e, quando possível, o último frame da cena anterior como referência.`;
-scenes.push({n:i+1,start,end,duration,prompt,edit:prompt});
-}
-renderScenes();$('continuity').innerHTML='<b>Ficha de continuidade — '+escapeHtml(project.title)+'</b><p>'+escapeHtml(project.continuity)+'</p><p class="small">Use as mesmas imagens de referência/Ingredients no Google Flow em todas as cenas.</p>';document.querySelector('[data-tab="production"]').click();
-}
-function renderScenes(){
-$('sceneList').className='';$('sceneList').innerHTML=scenes.map((s,i)=>`<div class="scene"><div class="scene-head"><b>CENA ${String(s.n).padStart(2,'0')} • ${s.start}–${s.end}s</b><span class="tag">${s.duration} segundos</span></div><textarea data-scene="${i}">${escapeHtml(s.edit)}</textarea><div class="actions"><button class="secondary" onclick="copyScene(${i})">Copiar prompt para Flow</button><button class="secondary" onclick="resetScene(${i})">Restaurar</button></div></div>`).join('');
-}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-window.copyScene=async i=>{let el=document.querySelector(`[data-scene="${i}"]`);scenes[i].edit=el.value;await navigator.clipboard.writeText(el.value).then(()=>alert('Prompt da cena copiado!')).catch(()=>alert('Selecione e copie o prompt.'))};
-window.resetScene=i=>{scenes[i].edit=scenes[i].prompt;renderScenes()};
-$('makeScript').onclick=buildScript;$('toProduction').onclick=makeScenes;
-$('copyScript').onclick=()=>navigator.clipboard.writeText(scriptText).then(()=>alert('Roteiro copiado!')).catch(()=>alert('Não foi possível copiar automaticamente.'));
-$('copyAll').onclick=()=>{scenes.forEach((s,i)=>{let el=document.querySelector(`[data-scene="${i}"]`);if(el)s.edit=el.value});navigator.clipboard.writeText(scenes.map(s=>s.edit).join('\\n\\n--- PRÓXIMA CENA ---\\n\\n')).then(()=>alert('Todos os prompts foram copiados!')).catch(()=>alert('Selecione e copie os prompts.'))};
-$('downloadPrompts').onclick=()=>{scenes.forEach((s,i)=>{let el=document.querySelector(`[data-scene="${i}"]`);if(el)s.edit=el.value});download('viral-ai-prompts-flow.txt',scenes.map(s=>s.edit).join('\\n\\n--- PRÓXIMA CENA ---\\n\\n'))};
-$('assemble').onclick=()=>{$('assembly').innerHTML='<b>Ordem de montagem preparada:</b> '+scenes.map(s=>'Cena '+String(s.n).padStart(2,'0')).join(' → ')+'.<br>Quando os clipes forem gerados e baixados do Flow, importe-os nesta ordem em um editor ou renderizador para unir de verdade. Este protótipo ainda não recebe nem concatena arquivos de vídeo automaticamente.'};
-function download(name,txt){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
-$('saveProject').onclick=()=>{if(!project)return;let list=JSON.parse(localStorage.getItem('viral-ai-v2')||'[]');list.unshift({...project,scenes,date:new Date().toLocaleString('pt-BR')});localStorage.setItem('viral-ai-v2',JSON.stringify(list));alert('Projeto salvo neste dispositivo.');renderProjects()};
-function renderProjects(){let list=JSON.parse(localStorage.getItem('viral-ai-v2')||'[]');$('projectList').className=list.length?'':'empty';$('projectList').innerHTML=list.length?list.map((p,i)=>`<div class="scene"><b>${escapeHtml(p.title)}</b><p class="small">${escapeHtml(p.date)} • ${escapeHtml(names[p.kind]||p.kind)}</p><button class="secondary" onclick="loadProject(${i})">Abrir projeto</button></div>`).join(''):'Nenhum projeto salvo.'}
-window.loadProject=i=>{let p=JSON.parse(localStorage.getItem('viral-ai-v2')||'[]')[i];project=p;kind=p.kind;scriptText=p.script;scenes=p.scenes||[];$('title').value=p.title;$('idea').value=p.idea;$('cast').value=p.cast||'';$('setting').value=p.setting||'';$('duration').value=p.secs;$('style').value=p.style;setKind(kind);$('scriptResult').className='output';$('scriptResult').textContent=scriptText;$('scriptActions').classList.remove('hidden');if(scenes.length){renderScenes();$('continuity').textContent=p.continuity}document.querySelector('[data-tab="create"]').click()};
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));['create','production','projects','guide'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));if(b.dataset.tab==='projects')renderProjects()});
+const $=id=>document.getElementById(id);
 
-// VIRAL AI v0.5: assistente de configuração Gemini.
-$('getGeminiKey').onclick=()=>window.open('https://aistudio.google.com/app/apikey','_blank','noopener');
-$('keyHelp').onclick=()=>window.open('https://ai.google.dev/gemini-api/docs/api-key','_blank','noopener');
-// A chave nunca é solicitada nem armazenada no navegador.
-$('checkApi').onclick=async()=>{
- const base=$('apiBase').value.trim().replace(/\/$/,'');
- if(!base){$('apiStatus').textContent='Informe o endereço do backend';return}
- if(!/^https:\/\//i.test(base)){ $('apiStatus').textContent='Use um endereço HTTPS';return }
- $('apiStatus').textContent='Testando…';
- try{const r=await fetch(base+'/api/status',{headers:{'Accept':'application/json'}});if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();localStorage.setItem('viral-ai-api-base',base);$('apiStatus').textContent=d.keyConfigured?'Backend conectado • Gemini pronto': 'Servidor conectado • falta configurar a chave no servidor';}
- catch(e){$('apiStatus').textContent='Não foi possível conectar';}
+const studioNames={
+fruit:'Novelas de frutas',
+soap:'Novelas tradicionais',
+dorama:'Doramas',
+kids:'Desenhos infantis',
+movie:'Filmes infantis',
+song:'Músicas infantis',
+bible:'Conteúdo bíblico',
+reddit:'Histórias Reddit',
+motivation:'Motivacionais',
+ugc:'UGC / TikTok Shop',
+photo:'Provador virtual',
+product:'Vídeos de produtos'
 };
 
-// Integração inicial com o backend VIRAL AI v0.6
-let remoteProjectId = null;
-const apiBase = () => (localStorage.getItem('viral-ai-api-base') || $('apiBase').value.trim()).replace(/\/$/,'');
-async function api(path, options={}) { const base=apiBase(); if(!base) throw new Error('Configure e teste o endereço HTTPS do backend primeiro.'); const r=await fetch(base+path,{...options,headers:{'Content-Type':'application/json',...(options.headers||{})}}); const d=await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error || ('Erro HTTP '+r.status)); return d; }
-$('generateGemini').onclick=async()=>{
- try {
-  if(!scenes.length) throw new Error('Gere o roteiro e crie as cenas primeiro.');
-  $('geminiJobStatus').textContent='Conferindo conexão e chave Gemini…';
-  const status=await api('/api/status'); if(!status.keyConfigured) throw new Error('A chave Gemini não está configurada no servidor. Abra o painel de hospedagem e cadastre GEMINI_API_KEY.');
-  const payload={title:project?.title||'Projeto VIRAL AI',aspectRatio:'9:16',scenes:scenes.map((s,i)=>({prompt:document.querySelector(`[data-scene="${i}"]`)?.value||s.edit||s.prompt}))};
-  const created=await api('/api/projects',{method:'POST',body:JSON.stringify(payload)}); remoteProjectId=created.id;
-  await api(`/api/projects/${remoteProjectId}/generate`,{method:'POST',body:'{}'});
-  $('geminiJobStatus').textContent='Projeto enviado! Gerando cenas em sequência…';
-  const poll=async()=>{const p=await api(`/api/projects/${remoteProjectId}`);$('geminiJobStatus').innerHTML=`<b>Status: ${escapeHtml(p.status)}</b><br>`+p.scenes.map(x=>`Cena ${x.number}: ${escapeHtml(x.status)}${x.error?' — '+escapeHtml(x.error):''}`).join('<br>');if(['generating','queued'].includes(p.status)){setTimeout(poll,12000);return;} if(p.status==='completed'){$('geminiJobStatus').innerHTML+=' <br><b>Todas as cenas foram geradas. Você já pode unir o vídeo.</b>';} }; setTimeout(poll,8000);
- } catch(e) { $('geminiJobStatus').textContent=e.message; if(e.message.includes('chave Gemini')) { $('getGeminiKey').scrollIntoView({behavior:'smooth',block:'center'}); } }
-};
-$('mergeGemini').onclick=async()=>{try{if(!remoteProjectId)throw new Error('Gere as cenas pelo Gemini primeiro.');$('geminiJobStatus').textContent='Montando MP4…';const d=await api(`/api/projects/${remoteProjectId}/merge`,{method:'POST',body:'{}'});$('geminiJobStatus').innerHTML=`<b>Vídeo final pronto!</b><br><a href="${apiBase()+d.finalUrl}" target="_blank" rel="noopener">Abrir / baixar MP4</a>`;}catch(e){$('geminiJobStatus').textContent=e.message;}};
-
+let kind='fruit';
+let project=null;
+let scriptText='';
+let scenes=[];
+let remoteProjectId=null;
 let importedClips=[];
-$('clipFiles').onchange=e=>{for(const f of Array.from(e.target.files||[])){if(f.type.startsWith('video/'))importedClips.push({name:f.name,size:f.size,url:URL.createObjectURL(f)});}renderClipList();};
-function renderClipList(){ $('clipList').innerHTML=importedClips.length?importedClips.map((f,i)=>`<div class="scene"><b>${i+1}. ${escapeHtml(f.name)}</b><div class="small">${(f.size/1024/1024).toFixed(1)} MB</div><video controls playsinline style="width:100%;max-height:220px;margin-top:8px;border-radius:10px" src="${f.url}"></video></div>`).join(''):'Nenhum clipe importado.'; }
-$('clearClips').onclick=()=>{importedClips.forEach(f=>URL.revokeObjectURL(f.url));importedClips=[];$('clipFiles').value='';renderClipList();};
 
-</script></body></html>
+const studioGrid=$('studioGrid');
+
+Object.entries(studioNames).forEach(([k,n])=>{
+const b=document.createElement('button');
+b.className='studio'+(k===kind?' selected':'');
+b.textContent=n;
+
+b.onclick=()=>{
+kind=k;
+document.querySelectorAll('.studio').forEach(x=>x.classList.remove('selected'));
+b.classList.add('selected');
+};
+
+studioGrid.appendChild(b);
+});
+
+function openModal(){
+$('keyModal').classList.add('show');
+$('geminiKeyInput').focus();
+}
+
+function closeModal(){
+$('keyModal').classList.remove('show');
+}
+
+$('openKeyModal').onclick=openModal;
+$('openKeyModal2').onclick=openModal;
+$('closeKeyModal').onclick=closeModal;
+
+$('getGeminiKey').onclick=$('getGeminiKeyModal').onclick=()=>{
+window.open('https://aistudio.google.com/app/apikey','_blank','noopener');
+};
+
+function baseUrl(){
+return (
+localStorage.getItem('viral-ai-api-base') ||
+$('apiBase').value.trim() ||
+'https://viral-ai.hostless.app'
+).replace(/\/+$/,'');
+}
+
+async function api(path,options={}){
+const base=baseUrl();
+
+if(!/^https:\/\//i.test(base)){
+throw new Error('O endereço do backend precisa começar com HTTPS.');
+}
+
+const response=await fetch(base+path,{
+...options,
+headers:{
+Accept:'application/json',
+'Content-Type':'application/json',
+...(options.headers||{})
+}
+});
+
+const data=await response.json().catch(()=>({}));
+
+if(!response.ok){
+throw new Error(data.error||`Erro HTTP ${response.status}`);
+}
+
+return data;
+}
+
+$('apiBase').value=
+localStorage.getItem('viral-ai-api-base') ||
+'https://viral-ai.hostless.app';
+
+$('checkApi').onclick=async()=>{
+const base=$('apiBase').value.trim().replace(/\/+$/,'');
+
+if(!/^https:\/\//i.test(base)){
+$('apiStatus').textContent='Informe um endereço HTTPS válido.';
+return;
+}
+
+localStorage.setItem('viral-ai-api-base',base);
+$('apiStatus').textContent='Testando conexão…';
+
+try{
+const d=await api('/api/status');
+
+$('apiStatus').innerHTML=d.keyConfigured
+?'<span class="good">Servidor conectado • chave Gemini configurada.</span>'
+:'<span class="bad">Servidor conectado • falta cadastrar a chave Gemini.</span>';
+
+}catch(e){
+$('apiStatus').textContent='Falha na conexão: '+e.message;
+}
+};
+
+$('saveKey').onclick=async()=>{
+const key=$('geminiKeyInput').value.trim();
+
+if(!key){
+$('keyStatus').textContent='Cole sua chave antes de salvar.';
+return;
+}
+
+if(!/^https:\/\//i.test(baseUrl())){
+$('keyStatus').textContent='O backend precisa usar HTTPS.';
+return;
+}
+
+$('saveKey').disabled=true;
+$('keyStatus').textContent='Enviando a chave com segurança…';
+
+try{
+
+const d=await api('/api/settings/gemini-key',{
+method:'POST',
+body:JSON.stringify({apiKey:key})
+});
+
+$('geminiKeyInput').value='';
+
+$('keyStatus').innerHTML=
+'<span class="good">'+
+(d.message||'Chave recebida pelo servidor.')+
+'</span>';
+
+$('apiStatus').textContent='Chave enviada. Verificando…';
+
+const status=await api('/api/status');
+
+$('apiStatus').textContent=status.keyConfigured
+?'Servidor conectado • Gemini pronto.'
+:'O servidor recebeu a solicitação, mas ainda informa que a chave não está configurada.';
+
+}catch(e){
+
+$('geminiKeyInput').value='';
+
+$('keyStatus').textContent=e.message.includes('404')
+?'A tela está pronta; o servidor ainda precisa da atualização da rota de cadastro da chave (/api/settings/gemini-key).'
+:'Não foi possível cadastrar a chave: '+e.message;
+
+}finally{
+$('saveKey').disabled=false;
+}
+};function buildScript(){
+
+const title=$('title').value.trim()||'Meu projeto VIRAL AI';
+const idea=$('idea').value.trim();
+
+if(!idea){
+alert('Descreva a ideia do projeto primeiro.');
+return;
+}
+
+const secs=Math.max(10,Math.min(600,Number($('duration').value)||60));
+const cast=$('cast').value.trim();
+const setting=$('setting').value.trim();
+const style=$('style').value;
+const product=$('product').value.trim();
+const features=$('features').value.trim();
+const platform=$('platform').value;
+
+const hook='Abrir com uma imagem, pergunta ou acontecimento que desperte curiosidade nos primeiros segundos.';
+
+const continuity=['fruit','soap','dorama','kids','movie'].includes(kind)
+?`PERSONAGENS FIXOS: ${cast||'Definir nomes, aparência, roupas, personalidade e voz.'}
+CENÁRIO FIXO: ${setting||'Definir cenário principal e paleta visual.'}
+REGRA: manter identidade, aparência, roupa, voz e personalidade consistentes entre cenas.`
+:`IDENTIDADE VISUAL: manter o mesmo apresentador, produto, voz e estilo visual em todas as cenas.`;
+
+const productInfo=['ugc','photo','product'].includes(kind)
+?`
+PRODUTO: ${product||'A definir'}
+CARACTERÍSTICAS INFORMADAS: ${features||'Não inventar características não fornecidas.'}
+PLATAFORMA: ${platform}`
+:'';
+
+const structure=kind==='reddit'
+?'ESTRUTURA: contexto → conflito → acontecimentos → revelações → resolução satisfatória.'
+:kind==='bible'
+?'ESTRUTURA: tema → contexto bíblico → reflexão → aplicação prática.'
+:'ESTRUTURA: apresentação → desenvolvimento → momento marcante → conclusão satisfatória.';
+
+scriptText=`VIRAL AI — ${title.toUpperCase()}
+ESTÚDIO: ${studioNames[kind]}
+DURAÇÃO: ${secs} segundos | ESTILO: ${style} | FORMATO: vertical 9:16
+PLATAFORMA: ${platform}
+
+IDEIA: ${idea}
+
+GANCHO: ${hook}
+
+${structure}
+
+${continuity}${productInfo}
+CENÁRIO: ${setting||'Definir de acordo com a ideia.'}
+
+ROTEIRO-BASE
+Criar uma narrativa coerente, com falas naturais, ações visuais claras e ritmo adequado à duração. Desenvolver a ideia sem contradizer os acontecimentos. Entregar um desfecho satisfatório no próprio vídeo.
+
+ENCERRAMENTO / CTA
+Finalizar com uma frase memorável e convite natural para comentar, seguir ou conhecer o produto, sem promessas enganosas.
+
+NOTA: este é um roteiro-base estruturado pelo protótipo; revise fatos, falas, versículos, alegações de produto e direitos de uso antes de publicar.`;
+
+project={
+title,kind,idea,secs,cast,setting,style,product,features,platform,continuity,script:scriptText
+};
+
+$('scriptResult').classList.remove('hidden');
+$('scriptResult').textContent=scriptText;
+$('scriptActions').classList.remove('hidden');
+}
+
+function makeScenes(){
+
+if(!project){
+alert('Crie o roteiro primeiro.');
+return;
+}
+
+const count=Math.ceil(project.secs/10);
+scenes=[];
+
+for(let i=0;i<count;i++){
+
+const start=i*10;
+const end=Math.min((i+1)*10,project.secs);
+const duration=end-start;
+
+const beat=i===0
+?'ABERTURA: apresentar a situação e prender a atenção.'
+:i===count-1
+?'ENCERRAMENTO: concluir a ação e entregar o desfecho.'
+:`CONTINUAÇÃO: avançar a história a partir do último quadro da cena ${i}.`;
+
+const prompt=`VIRAL AI — CENA ${String(i+1).padStart(2,'0')} (${start}-${end}s; ${duration}s)
+PROJETO: ${project.title}
+ESTÚDIO: ${studioNames[project.kind]}
+CONTINUIDADE FIXA: ${project.continuity}
+ESTILO: ${project.style}; vídeo vertical 9:16; áudio e diálogos em português brasileiro.
+IDEIA: ${project.idea}
+PERSONAGENS: ${project.cast||'Conforme definido no projeto.'}
+CENÁRIO: ${project.setting||'Manter o cenário estabelecido.'}
+AÇÃO: ${beat}
+INSTRUÇÃO: ${i===0?'Estabelecer visualmente personagens e cenário.':`Começar do estado final da cena ${i}, sem reiniciar a história.`}
+EVITAR: mudanças involuntárias de identidade, roupa, voz, cenário, objetos ou posições; personagens duplicados; texto ilegível; cortes contraditórios.
+REFERÊNCIA: reutilizar as mesmas imagens/Ingredients dos personagens e, se possível, o último frame da cena anterior.`;
+
+scenes.push({
+n:i+1,
+start,
+end,
+duration,
+prompt,
+edit:prompt
+});
+
+}
+
+renderScenes();
+
+$('continuity').textContent=
+'Ficha de continuidade — '+project.title+'\n'+project.continuity;
+
+document.querySelector('[data-tab="production"]').click();
+}
+
+function esc(s){
+return String(s).replace(/[&<>"']/g,c=>({
+'&':'&amp;',
+'<':'&lt;',
+'>':'&gt;',
+'"':'&quot;',
+"'":'&#39;'
+}[c]));
+}
+
+function renderScenes(){
+
+$('sceneList').innerHTML=scenes.map((s,i)=>`
+<div class="scene">
+<div class="scene-head">
+<b>CENA ${String(s.n).padStart(2,'0')} • ${s.start}–${s.end}s</b>
+<span class="tag">${s.duration} segundos</span>
+</div>
+<textarea data-scene="${i}" rows="9">${esc(s.edit)}</textarea>
+<div class="actions">
+<button class="secondary" onclick="copyScene(${i})">Copiar prompt</button>
+<button class="secondary" onclick="resetScene(${i})">Restaurar</button>
+</div>
+</div>
+`).join('');
+
+}
+
+window.copyScene=async i=>{
+
+const el=document.querySelector(`[data-scene="${i}"]`);
+scenes[i].edit=el.value;
+
+try{
+await navigator.clipboard.writeText(el.value);
+alert('Prompt copiado!');
+}catch{
+alert('Selecione e copie o texto.');
+}
+
+};
+
+window.resetScene=i=>{
+scenes[i].edit=scenes[i].prompt;
+renderScenes();
+};
+
+$('makeScript').onclick=buildScript;
+$('toProduction').onclick=makeScenes;
+
+$('copyScript').onclick=()=>{
+navigator.clipboard.writeText(scriptText)
+.then(()=>alert('Roteiro copiado!'))
+.catch(()=>alert('Selecione e copie o roteiro.'));
+};
+
+$('copyAll').onclick=()=>{
+
+scenes.forEach((s,i)=>{
+const el=document.querySelector(`[data-scene="${i}"]`);
+if(el)s.edit=el.value;
+});
+
+navigator.clipboard.writeText(
+scenes.map(s=>s.edit).join('\n\n--- PRÓXIMA CENA ---\n\n')
+)
+.then(()=>alert('Todos os prompts foram copiados!'))
+.catch(()=>alert('Selecione e copie os prompts.'));
+
+};
+
+function download(name,txt){
+
+const a=document.createElement('a');
+const url=URL.createObjectURL(
+new Blob([txt],{type:'text/plain;charset=utf-8'})
+);
+
+a.href=url;
+a.download=name;
+a.click();
+
+URL.revokeObjectURL(url);
+}
+
+$('downloadPrompts').onclick=()=>{
+
+scenes.forEach((s,i)=>{
+const el=document.querySelector(`[data-scene="${i}"]`);
+if(el)s.edit=el.value;
+});
+
+download(
+'viral-ai-prompts.txt',
+scenes.map(s=>s.edit).join('\n\n--- PRÓXIMA CENA ---\n\n')
+);
+
+};
+
+$('saveProject').onclick=()=>{
+
+if(!project)return;
+
+const list=JSON.parse(
+localStorage.getItem('viral-ai-v2')||'[]'
+);
+
+list.unshift({
+...project,
+scenes,
+date:new Date().toLocaleString('pt-BR')
+});
+
+localStorage.setItem('viral-ai-v2',JSON.stringify(list));
+
+alert('Projeto salvo neste dispositivo.');
+renderProjects();
+
+};
+
+function renderProjects(){
+
+const list=JSON.parse(
+localStorage.getItem('viral-ai-v2')||'[]'
+);
+
+$('projectList').className=list.length?'':'empty';
+
+$('projectList').innerHTML=list.length
+?list.map((p,i)=>`
+<div class="scene">
+<b>${esc(p.title)}</b>
+<p class="small">${esc(p.date)} • ${esc(studioNames[p.kind]||p.kind)}</p>
+<button class="secondary" onclick="loadProject(${i})">Abrir projeto</button>
+</div>
+`).join('')
+:'Nenhum projeto salvo neste dispositivo.';
+
+}
+
+window.loadProject=i=>{
+
+const p=JSON.parse(
+localStorage.getItem('viral-ai-v2')||'[]'
+)[i];
+
+project=p;
+kind=p.kind;
+scriptText=p.script;
+scenes=p.scenes||[];
+
+$('title').value=p.title;
+$('idea').value=p.idea;
+$('cast').value=p.cast||'';
+$('setting').value=p.setting||'';
+$('duration').value=p.secs;
+$('style').value=p.style;
+$('product').value=p.product||'';
+$('features').value=p.features||'';
+$('platform').value=p.platform||'YouTube Shorts';
+
+document.querySelectorAll('.studio').forEach((b,i)=>{
+const k=Object.keys(studioNames)[i];
+b.classList.toggle('selected',k===kind);
+});
+
+$('scriptResult').classList.remove('hidden');
+$('scriptResult').textContent=scriptText;
+$('scriptActions').classList.remove('hidden');
+
+if(scenes.length){
+renderScenes();
+$('continuity').textContent=p.continuity;
+}
+
+document.querySelector('[data-tab="create"]').click();
+
+};
+
+$('generateGemini').onclick=async()=>{
+
+try{
+
+if(!scenes.length){
+throw new Error('Crie o roteiro e as cenas primeiro.');
+}
+
+$('geminiJobStatus').textContent=
+'Conferindo conexão e chave Gemini…';
+
+let status;
+
+try{
+status=await api('/api/status');
+}catch(e){
+throw new Error('Não foi possível conectar ao servidor: '+e.message);
+}
+
+if(!status.keyConfigured){
+
+$('geminiJobStatus').textContent=
+'A chave Gemini ainda não está cadastrada. Cadastre-a na janela que será aberta.';
+
+openModal();
+return;
+
+}
+
+const payload={
+title:project?.title||'Projeto VIRAL AI',
+aspectRatio:'9:16',
+scenes:scenes.map((s,i)=>({
+prompt:
+document.querySelector(`[data-scene="${i}"]`)?.value||
+s.edit||
+s.prompt
+}))
+};
+
+const created=await api('/api/projects',{
+method:'POST',
+body:JSON.stringify(payload)
+});
+
+remoteProjectId=created.id;
+
+await api(`/api/projects/${remoteProjectId}/generate`,{
+method:'POST',
+body:'{}'
+});
+
+$('geminiJobStatus').textContent=
+'Projeto enviado ao backend. Acompanhando geração…';
+
+const poll=async()=>{
+
+const p=await api(`/api/projects/${remoteProjectId}`);
+
+$('geminiJobStatus').textContent=
+`Status: ${p.status}\n`+
+(p.scenes||[]).map(x=>
+`Cena ${x.number}: ${x.status}${x.error?' — '+x.error:''}`
+).join('\n');
+
+if(['generating','queued'].includes(p.status)){
+setTimeout(poll,12000);
+}else if(p.status==='completed'){
+$('geminiJobStatus').textContent+=
+' \nGeração concluída. Você pode tentar unir o MP4.';
+}
+
+};
+
+setTimeout(poll,8000);
+
+}catch(e){
+
+$('geminiJobStatus').textContent=e.message;
+
+}
+
+};
+
+$('mergeGemini').onclick=async()=>{
+
+try{
+
+if(!remoteProjectId){
+throw new Error('Envie um projeto para geração primeiro.');
+}
+
+$('geminiJobStatus').textContent='Montando MP4…';
+
+const d=await api(
+`/api/projects/${remoteProjectId}/merge`,
+{
+method:'POST',
+body:'{}'
+}
+);
+
+$('geminiJobStatus').innerHTML=
+`<b>Vídeo final informado pelo servidor.</b><br>
+<a href="${esc(baseUrl()+d.finalUrl)}" target="_blank" rel="noopener">Abrir / baixar MP4</a>`;
+
+}catch(e){
+
+$('geminiJobStatus').textContent=e.message;
+
+}
+
+};
+
+$('clipFiles').onchange=e=>{
+
+for(const f of Array.from(e.target.files||[])){
+
+if(f.type.startsWith('video/')){
+
+importedClips.push({
+name:f.name,
+size:f.size,
+url:URL.createObjectURL(f)
+});
+
+}
+
+}
+
+renderClipList();
+
+};
+
+function renderClipList(){
+
+$('clipList').innerHTML=importedClips.length
+?importedClips.map((f,i)=>`
+<div class="scene">
+<b>${i+1}. ${esc(f.name)}</b>
+<div class="small">${(f.size/1024/1024).toFixed(1)} MB</div>
+<video class="video" controls playsinline src="${f.url}"></video>
+</div>
+`).join('')
+:'<p class="empty">Nenhum clipe importado.</p>';
+
+}
+
+$('clearClips').onclick=()=>{
+
+importedClips.forEach(f=>URL.revokeObjectURL(f.url));
+importedClips=[];
+$('clipFiles').value='';
+renderClipList();
+
+};
+
+document.querySelectorAll('.tab').forEach(b=>{
+
+b.onclick=()=>{
+
+document.querySelectorAll('.tab').forEach(x=>
+x.classList.toggle('active',x===b)
+);
+
+['create','production','projects','guide'].forEach(id=>
+$(id).classList.toggle('hidden',id!==b.dataset.tab)
+);
+
+if(b.dataset.tab==='projects'){
+renderProjects();
+}
+
+};
+
+});
+
+renderProjects();
+renderClipList();
+
+</script>
+</body>
+</html>
