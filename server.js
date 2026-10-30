@@ -16,7 +16,6 @@ import { spawn } from 'node:child_process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
 
-// Usa uma pasta temporária gravável no Hostless.
 const DATA = '/tmp/viral-ai-data';
 const VIDEOS = path.join(DATA, 'videos');
 const JOBS_FILE = path.join(DATA, 'jobs.json');
@@ -25,6 +24,9 @@ const PORT = Number(process.env.PORT || 3000);
 const MODEL = process.env.MODEL || 'gemini-omni-1.1-flash';
 
 const app = express();
+
+// O Hostless usa proxy reverso. Confia no primeiro proxy à frente do app.
+app.set('trust proxy', 1);
 
 // Chave recebida pelo aplicativo: fica somente na memória.
 let runtimeGeminiKey = '';
@@ -90,7 +92,7 @@ app.get('/api/status', (_req, res) => {
   });
 });
 
-// Testa se o Chromium instalado pelo Playwright consegue abrir.
+// Teste temporário para verificar o Chromium no servidor.
 let browserCheckRunning = false;
 
 app.get('/api/flow/browser-check', async (_req, res) => {
@@ -102,7 +104,6 @@ app.get('/api/flow/browser-check', async (_req, res) => {
   }
 
   browserCheckRunning = true;
-
   let browser;
 
   try {
@@ -115,7 +116,6 @@ app.get('/api/flow/browser-check', async (_req, res) => {
     });
 
     const page = await browser.newPage();
-
     await page.goto('about:blank');
 
     const version = browser.version();
@@ -130,7 +130,6 @@ app.get('/api/flow/browser-check', async (_req, res) => {
       pageOpened: true,
       message: 'O Chromium abriu uma página de teste com sucesso.'
     });
-
   } catch (error) {
     if (browser) {
       await browser.close().catch(() => {});
@@ -142,7 +141,6 @@ app.get('/api/flow/browser-check', async (_req, res) => {
       ok: false,
       error: String(error.message || 'Falha ao iniciar o Chromium').slice(0, 700)
     });
-
   } finally {
     browserCheckRunning = false;
   }
@@ -284,7 +282,6 @@ async function generateScene(project, scene) {
 
     scene.status = 'completed';
     scene.videoUrl = `/media/${filename}`;
-
   } catch (error) {
     scene.status = 'error';
 
@@ -336,7 +333,10 @@ app.post('/api/projects/:id/generate', async (req, res) => {
     });
   }
 
-  if (project.status === 'generating') {
+  if (
+    project.status === 'generating' ||
+    project.status === 'queued'
+  ) {
     return res.status(409).json({
       error: 'Este projeto já está em geração.'
     });
@@ -375,7 +375,10 @@ app.post(
       });
     }
 
-    if (project.status === 'generating') {
+    if (
+      project.status === 'generating' ||
+      project.status === 'queued'
+    ) {
       return res.status(409).json({
         error: 'Aguarde a geração atual terminar.'
       });
@@ -464,6 +467,7 @@ app.post('/api/projects/:id/merge', async (req, res) => {
 
   if (
     project.status === 'generating' ||
+    project.status === 'queued' ||
     project.scenes.some(scene => scene.status !== 'completed')
   ) {
     return res.status(409).json({
