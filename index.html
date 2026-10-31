@@ -1,1068 +1,359 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VIRAL AI</title>
-
 <style>
-:root {
-  --bg: #100b18;
-  --panel: #1b1325;
-  --panel2: #241832;
-  --pink: #ff3e9d;
-  --purple: #a855f7;
-  --text: #f7f0ff;
-  --muted: #b9a9c9;
-  --border: #382647;
-  --green: #35d39a;
-  --red: #ff5d75;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-button, input, textarea, select {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-.app {
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 22px;
-}
-
-.logo {
-  font-size: 26px;
-  font-weight: 900;
-  letter-spacing: 1px;
-}
-
-.logo span {
-  color: var(--pink);
-}
-
-.subtitle {
-  color: var(--muted);
-  font-size: 13px;
-  margin-top: 5px;
-}
-
-.header-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.btn {
-  border: 1px solid var(--border);
-  background: var(--panel2);
-  color: var(--text);
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-weight: 700;
-}
-
-.btn:hover {
-  filter: brightness(1.15);
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--pink), var(--purple));
-  border: none;
-  color: white;
-}
-
-.btn-small {
-  padding: 7px 10px;
-  font-size: 12px;
-}
-
-.tabs {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-
-.tab {
-  border: 1px solid var(--border);
-  background: var(--panel);
-  color: var(--muted);
-  padding: 11px 16px;
-  border-radius: 10px;
-}
-
-.tab.active {
-  background: #382044;
-  color: white;
-  border-color: var(--pink);
-}
-
-.page {
-  display: none;
-}
-
-.page.active {
-  display: block;
-}
-
-.panel {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 18px;
-}
-
-.panel h2, .panel h3 {
-  margin-top: 0;
-}
-
-.panel-title {
-  font-size: 18px;
-  font-weight: 800;
-  margin-bottom: 16px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  margin-bottom: 14px;
-}
-
-.field label {
-  font-size: 13px;
-  color: var(--muted);
-  font-weight: 700;
-}
-
-input, textarea, select {
-  width: 100%;
-  color: var(--text);
-  background: #100b18;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 11px 12px;
-  outline: none;
-}
-
-input:focus, textarea:focus, select:focus {
-  border-color: var(--pink);
-}
-
-textarea {
-  min-height: 100px;
-  resize: vertical;
-  line-height: 1.5;
-}
-
-select option {
-  background: #1b1325;
-}
-
-.actions {
-  display: flex;
-  gap: 9px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-
-.notice {
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.status {
-  padding: 10px 12px;
-  border-radius: 9px;
-  background: #241832;
-  color: var(--muted);
-  font-size: 13px;
-  margin-top: 12px;
-}
-
-.status.success {
-  color: var(--green);
-}
-
-.status.error {
-  color: var(--red);
-}
-
-.scene-card, .project-card {
-  background: #160f20;
-  border: 1px solid var(--border);
-  border-radius: 13px;
-  padding: 15px;
-  margin-top: 12px;
-}
-
-.scene-header, .project-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-
-.scene-header strong, .project-header strong {
-  color: var(--pink);
-}
-
-.scene-card textarea {
-  min-height: 130px;
-}
-
-.empty {
-  text-align: center;
-  color: var(--muted);
-  padding: 25px 10px;
-}
-
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.75);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  z-index: 1000;
-}
-
-.modal.open {
-  display: flex;
-}
-
-.modal-content {
-  width: 100%;
-  max-width: 500px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-}
-
-.modal-content h2 {
-  margin-top: 0;
-}
-
-footer {
-  text-align: center;
-  color: var(--muted);
-  font-size: 12px;
-  padding: 20px 0 5px;
-}
-
-@media (max-width: 700px) {
-  .app {
-    padding: 12px;
-  }
-
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
-  .panel {
-    padding: 15px;
-  }
-
-  .logo {
-    font-size: 22px;
-  }
-}
+:root{--bg:#100b18;--panel:#1b1325;--panel2:#241832;--pink:#ff3e9d;--purple:#a855f7;--text:#f7f0ff;--muted:#b9a9c9;--border:#382647;--green:#35d39a;--red:#ff5d75}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.app{max-width:1200px;margin:auto;padding:20px}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.logo{font-size:26px;font-weight:900;letter-spacing:1px}
+.logo span{color:var(--pink)}
+.subtitle{color:var(--muted);font-size:13px;margin-top:5px}
+.header-actions,.actions,.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.btn,.tab{border:1px solid var(--border);background:var(--panel2);color:var(--text);padding:10px 14px;border-radius:10px;font-weight:700}
+.btn:hover{filter:brightness(1.15)}
+.btn-primary{background:linear-gradient(135deg,var(--pink),var(--purple));border:none;color:white}
+.btn-small{padding:7px 10px;font-size:12px}
+.tabs{margin-bottom:20px}
+.tab{background:var(--panel);color:var(--muted);padding:11px 16px}
+.tab.active{background:#382044;color:white;border-color:var(--pink)}
+.page{display:none}.page.active{display:block}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:18px}
+.panel h2,.panel h3{margin-top:0}
+.panel-title{font-size:18px;font-weight:800;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.field label{font-size:13px;color:var(--muted);font-weight:700}
+input,textarea,select{width:100%;color:var(--text);background:#100b18;border:1px solid var(--border);border-radius:10px;padding:11px 12px;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--pink)}
+textarea{min-height:100px;resize:vertical;line-height:1.5}
+select option{background:#1b1325}
+.notice{color:var(--muted);font-size:13px;line-height:1.5}
+.status{padding:10px 12px;border-radius:9px;background:#241832;color:var(--muted);font-size:13px;margin-top:12px;overflow-wrap:anywhere}
+.status.success{color:var(--green)}.status.error{color:var(--red)}
+.scene-card,.project-card{background:#160f20;border:1px solid var(--border);border-radius:13px;padding:15px;margin-top:12px}
+.scene-header,.project-header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.scene-header strong,.project-header strong{color:var(--pink)}
+.scene-card textarea{min-height:260px}
+.empty{text-align:center;color:var(--muted);padding:25px 10px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;padding:16px;z-index:1000}
+.modal.open{display:flex}
+.modal-content{width:100%;max-width:500px;background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px;max-height:90vh;overflow:auto}
+.modal-content h2{margin-top:0}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 0 5px}
+@media(max-width:700px){.app{padding:12px}.grid{grid-template-columns:1fr}.panel{padding:15px}.logo{font-size:22px}}
 </style>
 </head>
-
 <body>
 <div class="app">
-
 <header>
-  <div>
-    <div class="logo">VIRAL <span>AI</span></div>
-    <div class="subtitle">Crie roteiros, cenas e projetos para vídeos com inteligência artificial.</div>
-  </div>
-
-  <div class="header-actions">
-    <button class="btn" id="geminiButton">Configurar Gemini</button>
-    <button class="btn btn-primary" id="newProjectButton">＋ Novo projeto</button>
-  </div>
+<div>
+<div class="logo">VIRAL <span>AI</span></div>
+<div class="subtitle">Crie roteiros, cenas e projetos para vídeos com inteligência artificial.</div>
+</div>
+<div class="header-actions">
+<button class="btn" id="geminiButton">Configurar Gemini</button>
+<button class="btn btn-primary" id="newProjectButton">＋ Novo projeto</button>
+</div>
 </header>
 
 <nav class="tabs">
-  <button class="tab active" data-page="create">🎬 Criar</button>
-  <button class="tab" data-page="production">🎥 Produção</button>
-  <button class="tab" data-page="projects">📁 Projetos</button>
-  <button class="tab" data-page="guide">❔ Ajuda</button>
+<button class="tab active" data-page="create">🎬 Criar</button>
+<button class="tab" data-page="production">🎥 Produção</button>
+<button class="tab" data-page="projects">📁 Projetos</button>
+<button class="tab" data-page="guide">❔ Ajuda</button>
 </nav>
 
 <main>
-
 <section class="page active" id="page-create">
-  <div class="panel">
-    <div class="panel-title">✨ Criar conteúdo viral</div>
+<div class="panel">
+<div class="panel-title">✨ Criar conteúdo viral</div>
+<div class="grid">
+<div class="field"><label for="contentType">Tipo de conteúdo</label>
+<select id="contentType">
+<option value="fruta">Frutas falantes</option><option value="sabonete">Sabonetes e produtos</option><option value="dorama">Dorama / história dramática</option><option value="criancas">Animação infantil</option><option value="filme">Filme / curta-metragem</option><option value="musica">Música infantil</option><option value="biblia">História bíblica</option><option value="reddit">História estilo Reddit</option><option value="motivacao">Motivacional</option><option value="ugc">UGC / anúncio realista</option><option value="foto">Prompt para imagem</option><option value="produto">Vídeo de produto</option>
+</select></div>
+<div class="field"><label for="platform">Plataforma</label>
+<select id="platform"><option>YouTube Shorts</option><option>TikTok</option><option>Instagram Reels</option><option>YouTube</option></select></div>
+<div class="field"><label for="duration">Duração aproximada</label>
+<select id="duration"><option value="30">30 segundos</option><option value="60" selected>1 minuto</option><option value="90">1 minuto e 30 segundos</option><option value="180">3 minutos</option></select></div>
+<div class="field"><label for="visualStyle">Estilo visual</label>
+<select id="visualStyle"><option value="animação 3D colorida">Animação 3D colorida</option><option value="animação 2D">Animação 2D</option><option value="fotorealista">Fotorealista</option><option value="cinematográfico">Cinematográfico</option><option value="estilo desenho infantil">Desenho infantil</option></select></div>
+</div>
+<div class="field"><label for="idea">Ideia / tema do vídeo</label><textarea id="idea" placeholder="Descreva a ideia, acontecimentos ou mensagem..."></textarea></div>
+<div class="grid">
+<div class="field"><label for="characters">Personagens</label><input id="characters" placeholder="Ex.: moranguinha vermelha com vestido rosa"></div>
+<div class="field"><label for="setting">Cenário</label><input id="setting" placeholder="Ex.: banheiro infantil colorido"></div>
+<div class="field"><label for="product">Produto (se houver)</label><input id="product" placeholder="Nome ou descrição do produto"></div>
+<div class="field"><label for="features">Detalhes importantes</label><input id="features" placeholder="Ex.: cores, aparência, características"></div>
+</div>
+<div class="field"><label for="continuity">Continuidade entre cenas</label><textarea id="continuity" placeholder="O que deve permanecer igual entre as cenas?"></textarea></div>
+<div class="actions"><button class="btn btn-primary" id="generateButton">✨ Gerar roteiro e cenas</button><button class="btn" id="clearButton">Limpar</button></div>
+<div class="status" id="createStatus">Preencha a ideia e clique em “Gerar roteiro e cenas”.</div>
+</div>
 
-    <div class="grid">
-      <div class="field">
-        <label for="contentType">Tipo de conteúdo</label>
-        <select id="contentType">
-          <option value="fruta">Frutas falantes</option>
-          <option value="sabonete">Sabonetes e produtos</option>
-          <option value="dorama">Dorama / história dramática</option>
-          <option value="criancas">Animação infantil</option>
-          <option value="filme">Filme / curta-metragem</option>
-          <option value="musica">Música infantil</option>
-          <option value="biblia">História bíblica</option>
-          <option value="reddit">História estilo Reddit</option>
-          <option value="motivacao">Motivacional</option>
-          <option value="ugc">UGC / anúncio realista</option>
-          <option value="foto">Prompt para imagem</option>
-          <option value="produto">Vídeo de produto</option>
-        </select>
-      </div>
+<div class="panel">
+<div class="panel-title">📝 Roteiro</div>
+<div class="field"><textarea id="scriptOutput" placeholder="O roteiro gerado aparecerá aqui..."></textarea></div>
+<div class="actions"><button class="btn" id="copyScriptButton">Copiar roteiro</button><button class="btn" id="saveProjectButton">Salvar projeto</button></div>
+</div>
 
-      <div class="field">
-        <label for="platform">Plataforma</label>
-        <select id="platform">
-          <option value="YouTube Shorts">YouTube Shorts</option>
-          <option value="TikTok">TikTok</option>
-          <option value="Instagram Reels">Instagram Reels</option>
-          <option value="YouTube">YouTube</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="duration">Duração aproximada</label>
-        <select id="duration">
-          <option value="30">30 segundos</option>
-          <option value="60" selected>1 minuto</option>
-          <option value="90">1 minuto e 30 segundos</option>
-          <option value="180">3 minutos</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="visualStyle">Estilo visual</label>
-        <select id="visualStyle">
-          <option value="animação 3D colorida">Animação 3D colorida</option>
-          <option value="animação 2D">Animação 2D</option>
-          <option value="fotorealista">Fotorealista</option>
-          <option value="cinematográfico">Cinematográfico</option>
-          <option value="estilo desenho infantil">Desenho infantil</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="field">
-      <label for="idea">Ideia / tema do vídeo</label>
-      <textarea id="idea" placeholder="Descreva a ideia do vídeo, personagens, acontecimentos ou mensagem..."></textarea>
-    </div>
-
-    <div class="grid">
-      <div class="field">
-        <label for="characters">Personagens</label>
-        <input id="characters" placeholder="Ex.: pinguim fofo, frutas falantes">
-      </div>
-
-      <div class="field">
-        <label for="setting">Cenário</label>
-        <input id="setting" placeholder="Ex.: quarto colorido, floresta mágica">
-      </div>
-
-      <div class="field">
-        <label for="product">Produto (se houver)</label>
-        <input id="product" placeholder="Nome ou descrição do produto">
-      </div>
-
-      <div class="field">
-        <label for="features">Detalhes importantes</label>
-        <input id="features" placeholder="Ex.: cores, aparência, características">
-      </div>
-    </div>
-
-    <div class="field">
-      <label for="continuity">Continuidade entre cenas</label>
-      <textarea id="continuity" placeholder="Descreva o que deve permanecer igual entre as cenas (personagens, roupas, cenário etc.)."></textarea>
-    </div>
-
-    <div class="actions">
-      <button class="btn btn-primary" id="generateButton">✨ Gerar roteiro e cenas</button>
-      <button class="btn" id="clearButton">Limpar</button>
-    </div>
-
-    <div class="status" id="createStatus">Preencha a ideia e clique em “Gerar roteiro e cenas”.</div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-title">📝 Roteiro</div>
-    <div class="field">
-      <textarea id="scriptOutput" placeholder="O roteiro gerado aparecerá aqui..."></textarea>
-    </div>
-    <div class="actions">
-      <button class="btn" id="copyScriptButton">Copiar roteiro</button>
-      <button class="btn" id="saveProjectButton">Salvar projeto</button>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-title">🎞️ Cenas e prompts</div>
-    <div id="scenesContainer">
-      <div class="empty">Suas cenas aparecerão aqui depois de gerar o roteiro.</div>
-    </div>
-  </div>
+<div class="panel">
+<div class="panel-title">🎞️ Cenas e prompts</div>
+<p class="notice">Cada prompt inclui continuidade visual, ação, expressão, câmera, iluminação e instruções para geração de vídeo.</p>
+<div id="scenesContainer"><div class="empty">Suas cenas aparecerão aqui depois de gerar o roteiro.</div></div>
+</div>
 </section>
 
 <section class="page" id="page-production">
-  <div class="panel">
-    <div class="panel-title">🎥 Produção de vídeo</div>
-    <p class="notice">Importe clipes do seu dispositivo para organizar uma prévia do projeto. A montagem final depende de um editor de vídeo ou de um serviço de produção conectado.</p>
-
-    <div class="field">
-      <label for="videoFiles">Importar clipes</label>
-      <input id="videoFiles" type="file" accept="video/*" multiple>
-    </div>
-
-    <div id="videoPreview"></div>
-
-    <div class="actions">
-      <button class="btn" id="clearVideosButton">Limpar clipes</button>
-    </div>
-
-    <div class="status" id="productionStatus">Nenhum clipe importado.</div>
-  </div>
+<div class="panel">
+<div class="panel-title">🎥 Produção de vídeo</div>
+<p class="notice">Importe clipes do seu dispositivo para organizar uma prévia. A montagem final depende de um editor ou serviço de produção conectado.</p>
+<div class="field"><label for="videoFiles">Importar clipes</label><input id="videoFiles" type="file" accept="video/*" multiple></div>
+<div id="videoPreview"></div>
+<div class="actions"><button class="btn" id="clearVideosButton">Limpar clipes</button></div>
+<div class="status" id="productionStatus">Nenhum clipe importado.</div>
+</div>
 </section>
 
 <section class="page" id="page-projects">
-  <div class="panel">
-    <div class="panel-title">📁 Meus projetos</div>
-    <p class="notice">Os projetos são salvos neste navegador. Eles não são enviados automaticamente para a nuvem.</p>
-    <div id="projectsContainer">
-      <div class="empty">Nenhum projeto salvo ainda.</div>
-    </div>
-  </div>
+<div class="panel"><div class="panel-title">📁 Meus projetos</div><p class="notice">Os projetos são salvos neste navegador.</p><div id="projectsContainer"><div class="empty">Nenhum projeto salvo ainda.</div></div></div>
 </section>
 
 <section class="page" id="page-guide">
-  <div class="panel">
-    <div class="panel-title">❔ Como usar o VIRAL AI</div>
-    <ol>
-      <li>Escolha o tipo de conteúdo e a plataforma.</li>
-      <li>Escreva a ideia do vídeo e os detalhes dos personagens.</li>
-      <li>Clique em “Gerar roteiro e cenas”.</li>
-      <li>Edite os textos e copie os prompts para sua ferramenta de vídeo.</li>
-      <li>Salve o projeto para continuar depois.</li>
-      <li>Na aba Produção, importe clipes para organizá-los.</li>
-    </ol>
-    <p class="notice">A configuração do Gemini e a geração por API dependem de uma conexão válida com o serviço.</p>
-  </div>
+<div class="panel">
+<div class="panel-title">❔ Como usar o VIRAL AI</div>
+<ol><li>Escolha o tipo de conteúdo e a plataforma.</li><li>Descreva a ideia e os personagens.</li><li>Informe aparência, roupas e cenário.</li><li>Gere o roteiro e as cenas.</li><li>Copie os prompts para sua ferramenta de vídeo.</li><li>Salve o projeto para continuar depois.</li></ol>
+<p class="notice">A criação de roteiros desta versão utiliza modelos locais de texto. A conexão Gemini é configurada separadamente. A automação do Google Flow ainda precisa ser implementada e testada.</p>
+</div>
 </section>
-
 </main>
-
 <footer>VIRAL AI • Ferramenta de criação de conteúdo</footer>
 </div>
 
 <div class="modal" id="geminiModal">
-  <div class="modal-content">
-    <h2>Configurar Gemini</h2>
-    <p class="notice">Insira sua chave de API para habilitar recursos conectados ao Gemini.</p>
-
-    <div class="field">
-      <label for="geminiKey">Chave da API</label>
-      <input id="geminiKey" type="password" placeholder="Cole sua chave aqui">
-    </div>
-
-    <div class="actions">
-      <button class="btn btn-primary" id="saveGeminiButton">Salvar chave</button>
-      <button class="btn" id="closeGeminiButton">Fechar</button>
-    </div>
-
-    <p class="notice">Nunca compartilhe sua chave de API. Use apenas em um ambiente confiável.</p>
-    <div class="status" id="geminiStatus">Chave não configurada.</div>
-  </div>
+<div class="modal-content">
+<h2>Configurar Gemini</h2>
+<p class="notice">Insira sua chave de API. Ela será enviada ao backend para configuração.</p>
+<div class="field"><label for="geminiKey">Chave da API</label><input id="geminiKey" type="password" autocomplete="off" placeholder="Cole sua chave aqui"></div>
+<div class="actions"><button class="btn btn-primary" id="saveGeminiButton">Salvar chave</button><button class="btn" id="closeGeminiButton">Fechar</button></div>
+<p class="notice">Não compartilhe sua chave. Use apenas em um ambiente confiável.</p>
+<div class="status" id="geminiStatus">Verificando configuração...</div>
+</div>
 </div>
 
-<script>const API_BASE = "https://viral-ai.hostless.app";
-const STORAGE_KEY = "viral-ai-v2";
+<script>
+const API_BASE="https://viral-ai.hostless.app";
+const STORAGE_KEY="viral-ai-v2";
+let currentProject=null,generatedScenes=[],importedVideoUrls=[];
 
-let currentProject = null;
-let generatedScenes = [];
-let importedVideoUrls = [];
+const $=id=>document.getElementById(id);
 
-const $ = (id) => document.getElementById(id);
+function setStatus(id,message,type=""){
+const el=$(id);if(!el)return;
+el.textContent=message;el.className="status"+(type?" "+type:"");
+}
+function escapeHtml(value){
+return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function switchPage(name){
+document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.page===name));
+document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id==="page-"+name));
+if(name==="projects")renderProjects();
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>switchPage(b.dataset.page)));
 
-function setStatus(id, message, type = "") {
-  const element = $(id);
-  if (!element) return;
-  element.textContent = message;
-  element.className = "status" + (type ? " " + type : "");
+function getFormData(){
+return{
+title:$("idea").value.trim().slice(0,80)||"Meu projeto VIRAL AI",
+kind:$("contentType").value,platform:$("platform").value,
+secs:Number($("duration").value),style:$("visualStyle").value,
+idea:$("idea").value.trim(),cast:$("characters").value.trim(),
+setting:$("setting").value.trim(),product:$("product").value.trim(),
+features:$("features").value.trim(),continuity:$("continuity").value.trim()
+};
 }
 
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  }[char]));
+function buildScript(d){
+const idea=d.idea,cast=d.cast||"personagens principais",setting=d.setting||"cenário adequado à história";
+if(d.kind==="reddit")return `TÍTULO: ${d.title}\n\nGANCHO:\n${idea}\n\nHISTÓRIA:\nA história começa com uma situação inesperada envolvendo ${cast}. Novos detalhes aumentam a curiosidade, o conflito cresce e uma revelação esclarece os acontecimentos. O final resolve a história de forma satisfatória.\n\nDURAÇÃO: ${d.secs} segundos.\nPLATAFORMA: ${d.platform}.`;
+if(d.kind==="musica"||d.kind==="criancas")return `TÍTULO: ${d.title}\n\n[INTRO]\n${cast} chegou para brincar!\nTodo mundo vai cantar!\n\n[VERSO 1]\n${idea}\nBate palmas, gira então,\nVem dançar nessa canção!\n\n[REFRÃO]\nPula, pula, sem parar,\nTodo mundo vai cantar!\nGira, gira pelo chão,\nBate palmas, bate a mão!\n\n[FINAL]\nTchau, tchau, até já!\nA brincadeira vai voltar!`;
+if(d.kind==="motivacao")return `TÍTULO: ${d.title}\n\nGANCHO:\n${idea}\n\nNARRAÇÃO:\nNem todos os dias serão fáceis, mas cada passo importa. Mesmo quando ninguém percebe seu esforço, continue construindo seu caminho. Não precisa ser perfeito: precisa ser verdadeiro e constante.\n\nENCERRAMENTO:\nA mudança começa quando você decide não desistir de si.`;
+if(d.kind==="ugc"||d.kind==="produto")return `TÍTULO: ${d.title}\n\n[GANCHO]\nVocê precisa conhecer isso!\n\n[APRESENTAÇÃO]\n${idea}\n\n[DEMONSTRAÇÃO]\nMostre ${d.product||"o produto"} em uso. Destaque: ${d.features||"seus principais detalhes"}.\n\n[ENCERRAMENTO]\nApresente uma chamada para ação natural, sem promessas exageradas.`;
+return `TÍTULO: ${d.title}\n\n[ABERTURA]\n${idea}\n\n[DESENVOLVIMENTO]\n${cast} está em ${setting}. A história avança por acontecimentos visuais claros, com começo, desenvolvimento e conclusão.\n\n[MOMENTO PRINCIPAL]\nApresente o acontecimento mais importante de forma marcante.\n\n[ENCERRAMENTO]\nFinalize com uma conclusão visual satisfatória.\n\nESTILO: ${d.style}.\nDURAÇÃO: ${d.secs} segundos.\nDETALHES: ${d.features}.`;
 }
 
-function switchPage(pageName) {
-  document.querySelectorAll(".tab").forEach((button) => {
-    button.classList.toggle("active", button.dataset.page === pageName);
-  });
-
-  document.querySelectorAll(".page").forEach((page) => {
-    page.classList.toggle("active", page.id === "page-" + pageName);
-  });
-
-  if (pageName === "projects") renderProjects();
+function characterBible(d){
+return `GUIA FIXO DE CONTINUIDADE DOS PERSONAGENS:\n${d.cast||"Personagens principais definidos pela história."}\n${d.features?"Características adicionais: "+d.features:"Não inventar mudanças de aparência."}\nManter exatamente os mesmos personagens em todas as cenas: mesmo formato do rosto, olhos, corpo, cores, roupas, acessórios, proporções e identidade visual. Não criar versões alternativas.`;
 }
 
-document.querySelectorAll(".tab").forEach((button) => {
-  button.addEventListener("click", () => switchPage(button.dataset.page));
+function buildScenes(d){
+const count=Math.max(1,Math.ceil(d.secs/10)),scenes=[];
+const phases=[
+"GANCHO: apresentar imediatamente o personagem principal com uma ação visual atraente.",
+"APRESENTAÇÃO: mostrar o personagem, sua personalidade e o objetivo da história.",
+"DESENVOLVIMENTO: realizar uma ação clara que faça a história avançar.",
+"INTERAÇÃO: mostrar reação, expressão ou interação natural entre os personagens.",
+"CLÍMAX: destacar o momento mais importante da história.",
+"CONCLUSÃO: resolver a situação e mostrar uma reação final satisfatória."
+];
+for(let i=0;i<count;i++){
+const start=i*10,end=Math.min(start+10,d.secs);
+const phase=i===0?phases[0]:i===count-1?phases[5]:phases[Math.min(i,4)];
+const prompt=[
+`VÍDEO — CENA ${i+1} DE ${count}.`,
+`Duração: ${end-start} segundos. Intervalo: ${start}s a ${end}s.`,
+`IDEIA CENTRAL: ${d.idea}.`,
+characterBible(d),
+`AÇÃO ESPECÍFICA: ${phase}`,
+`Personagens em cena: ${d.cast||"personagens principais da história"}.`,
+`Cenário: ${d.setting||"criar cenário coerente com a história"}, com elementos visuais organizados e reconhecíveis.`,
+`Estilo: ${d.style}, com acabamento visual de alta qualidade e animação fluida.`,
+`MOVIMENTO: movimentos corporais naturais, gestos compreensíveis, expressões faciais bem definidas e ações contínuas, sem movimentos bruscos ou deformações.`,
+`CÂMERA: enquadramento médio ou aberto que mostre claramente a ação; câmera estável com movimento suave quando necessário.`,
+`ILUMINAÇÃO: iluminação coerente com o ambiente, cores equilibradas e personagens bem visíveis.`,
+`COMPOSIÇÃO: vídeo vertical 9:16 para ${d.platform}; personagem principal em destaque e espaço visual suficiente para compreender a ação.`,
+d.product?`Produto: ${d.product}. Mostrar o produto de forma fiel e legível.`:"",
+d.features?`Detalhes adicionais: ${d.features}.`:"",
+d.continuity?`REGRAS DE CONTINUIDADE: ${d.continuity}.`:"",
+`CONTINUIDADE ENTRE CENAS: preservar cenário, identidade, roupas, acessórios, cores, proporções e estilo dos personagens. A cena deve começar de forma compatível com a anterior.`,
+`RESTRIÇÕES: não inserir legendas, palavras, letras, marcas d'água, logotipos ou textos aleatórios. Não duplicar personagens, não deformar mãos, olhos ou rostos, não trocar roupas ou cores.`,
+`RESULTADO ESPERADO: uma cena visualmente clara, envolvente, coerente com a história e pronta para geração em ferramenta de vídeo.`
+].filter(Boolean).join("\n\n");
+scenes.push({number:i+1,start,end,prompt});
+}
+return scenes;
+}
+
+function renderScenes(){
+const c=$("scenesContainer");
+if(!generatedScenes.length){c.innerHTML='<div class="empty">Nenhuma cena criada.</div>';return;}
+c.innerHTML=generatedScenes.map((s,i)=>`<div class="scene-card"><div class="scene-header"><strong>Cena ${s.number}</strong><span class="notice">${s.start}s – ${s.end}s</span></div><textarea data-scene-index="${i}">${escapeHtml(s.prompt)}</textarea><div class="actions"><button class="btn btn-small" data-copy-scene="${i}">Copiar prompt</button><button class="btn btn-small" data-reset-scene="${i}">Restaurar prompt</button></div></div>`).join("");
+c.querySelectorAll("[data-scene-index]").forEach(t=>t.addEventListener("input",()=>generatedScenes[Number(t.dataset.sceneIndex)].prompt=t.value));
+c.querySelectorAll("[data-copy-scene]").forEach(b=>b.addEventListener("click",async()=>{await copyText(generatedScenes[Number(b.dataset.copyScene)].prompt);b.textContent="Copiado!";setTimeout(()=>b.textContent="Copiar prompt",1200);}));
+c.querySelectorAll("[data-reset-scene]").forEach(b=>b.addEventListener("click",()=>{const i=Number(b.dataset.resetScene);generatedScenes[i].prompt=buildScenes(currentProject)[i].prompt;renderScenes();}));
+}
+
+function createProject(){
+const d=getFormData();
+if(!d.idea){setStatus("createStatus","Digite a ideia do vídeo antes de gerar.","error");$("idea").focus();return;}
+currentProject={...d,script:buildScript(d),scenes:buildScenes(d),date:new Date().toISOString()};
+generatedScenes=currentProject.scenes.map(s=>({...s}));
+$("scriptOutput").value=currentProject.script;renderScenes();
+setStatus("createStatus","Roteiro e prompts detalhados gerados! Você pode editar as cenas.","success");
+}
+$("generateButton").addEventListener("click",createProject);
+
+$("clearButton").addEventListener("click",()=>{
+["idea","characters","setting","product","features","continuity","scriptOutput"].forEach(id=>$(id).value="");
+generatedScenes=[];currentProject=null;renderScenes();setStatus("createStatus","Campos limpos.");
 });
 
-function getFormData() {
-  return {
-    title: $("idea").value.trim().slice(0, 80) || "Meu projeto VIRAL AI",
-    kind: $("contentType").value,
-    platform: $("platform").value,
-    secs: Number($("duration").value),
-    style: $("visualStyle").value,
-    idea: $("idea").value.trim(),
-    cast: $("characters").value.trim(),
-    setting: $("setting").value.trim(),
-    product: $("product").value.trim(),
-    features: $("features").value.trim(),
-    continuity: $("continuity").value.trim()
-  };
+async function copyText(text){
+try{await navigator.clipboard.writeText(text);}
+catch{const t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();}
 }
-
-function buildScript(data) {
-  const idea = data.idea || "Uma história divertida e envolvente";
-  const characters = data.cast || "personagens carismáticos";
-  const setting = data.setting || "um cenário colorido";
-  const product = data.product ? ` Produto: ${data.product}.` : "";
-  const details = data.features ? ` Detalhes: ${data.features}.` : "";
-  const total = data.secs;
-
-  if (data.kind === "reddit") {
-    return `TÍTULO: ${data.title}\n\n` +
-      `GANCHO:\n${idea}\n\n` +
-      `HISTÓRIA:\n` +
-      `A história começa com uma situação inesperada envolvendo ${characters}. ` +
-      `Aos poucos, novos detalhes aparecem e aumentam a curiosidade. ` +
-      `O conflito cresce até uma revelação surpreendente, mas coerente. ` +
-      `No final, os acontecimentos são esclarecidos e a história termina de forma satisfatória.\n\n` +
-      `DURAÇÃO: aproximadamente ${total} segundos.\n` +
-      `PLATAFORMA: ${data.platform}.`;
-  }
-
-  if (data.kind === "musica" || data.kind === "criancas") {
-    return `TÍTULO: ${data.title}\n\n` +
-      `[INTRO]\n${characters} chegou para brincar!\n` +
-      `Todo mundo vai cantar!\n\n` +
-      `[VERSO 1]\n${idea}\n` +
-      `Bate palmas, gira então,\n` +
-      `Vem dançar nessa canção!\n\n` +
-      `[REFRÃO]\n` +
-      `Pula, pula, sem parar,\n` +
-      `Todo mundo vai cantar!\n` +
-      `Gira, gira pelo chão,\n` +
-      `Bate palmas, bate a mão!\n\n` +
-      `[FINAL]\n` +
-      `Tchau, tchau, até já!\n` +
-      `A brincadeira vai voltar!`;
-  }
-
-  if (data.kind === "motivacao") {
-    return `TÍTULO: ${data.title}\n\n` +
-      `GANCHO:\n${idea}\n\n` +
-      `NARRAÇÃO:\n` +
-      `Nem todos os dias serão fáceis, mas cada passo importa. ` +
-      `Mesmo quando ninguém percebe seu esforço, continue construindo seu caminho. ` +
-      `Não precisa ser perfeito: precisa ser verdadeiro e constante. ` +
-      `A mudança começa quando você decide não desistir de si.\n\n` +
-      `ENCERRAMENTO:\n${idea}\n\n` +
-      `DURAÇÃO: aproximadamente ${total} segundos.`;
-  }
-
-  if (data.kind === "ugc" || data.kind === "produto") {
-    return `TÍTULO: ${data.title}\n\n` +
-      `[GANCHO]\nVocê precisa conhecer isso!\n\n` +
-      `[APRESENTAÇÃO]\n${idea}\n\n` +
-      `[DEMONSTRAÇÃO]\n` +
-      `Mostre ${data.product || "o produto"} em uso, destacando seus detalhes. ` +
-      `${data.features}\n\n` +
-      `[ENCERRAMENTO]\n` +
-      `Apresente uma chamada para ação natural, sem promessas exageradas.\n\n` +
-      `DURAÇÃO: aproximadamente ${total} segundos.`;
-  }
-
-  return `TÍTULO: ${data.title}\n\n` +
-    `[CENA INICIAL — GANCHO]\n${idea}\n\n` +
-    `[DESENVOLVIMENTO]\n` +
-    `${characters} está em ${setting}. ` +
-    `A história se desenvolve com uma sequência de acontecimentos visuais e emocionantes. ` +
-    `Cada cena avança a narrativa e mantém a atenção do público.\n\n` +
-    `[MOMENTO PRINCIPAL]\n` +
-    `Apresente o acontecimento mais importante da história de forma clara e marcante.\n\n` +
-    `[ENCERRAMENTO]\n` +
-    `Finalize com uma conclusão visual satisfatória.\n\n` +
-    `ESTILO: ${data.style}.\n` +
-    `DURAÇÃO: aproximadamente ${total} segundos.\n` +
-    `${product}${details}`;
-}
-
-function buildScenes(data) {
-  const sceneCount = Math.max(1, Math.ceil(data.secs / 10));
-  const scenes = [];
-
-  for (let index = 0; index < sceneCount; index++) {
-    const start = index * 10;
-    const end = Math.min(start + 10, data.secs);
-
-    const phase = index === 0
-      ? "abertura com gancho visual"
-      : index === sceneCount - 1
-        ? "encerramento marcante e satisfatório"
-        : "desenvolvimento da história";
-
-    const prompt = [
-      `Cena ${index + 1}, duração aproximada de ${end - start} segundos.`,
-      `Tipo de conteúdo: ${data.kind}.`,
-      `Ideia: ${data.idea || "história envolvente"}.`,
-      `Ação da cena: ${phase}.`,
-      `Personagens: ${data.cast || "personagens principais"}.`,
-      `Cenário: ${data.setting || "cenário adequado à história"}.`,
-      `Estilo visual: ${data.style}.`,
-      `Formato vertical 9:16 para ${data.platform}.`,
-      data.product ? `Produto: ${data.product}.` : "",
-      data.features ? `Detalhes importantes: ${data.features}.` : "",
-      data.continuity ? `Continuidade: ${data.continuity}.` : "",
-      "Manter aparência, roupas, cores e características dos personagens consistentes.",
-      "Movimento natural, composição clara, sem textos aleatórios na imagem."
-    ].filter(Boolean).join(" ");
-
-    scenes.push({
-      number: index + 1,
-      start,
-      end,
-      prompt
-    });
-  }
-
-  return scenes;
-}
-
-function renderScenes() {
-  const container = $("scenesContainer");
-
-  if (!generatedScenes.length) {
-    container.innerHTML = '<div class="empty">Nenhuma cena criada.</div>';
-    return;
-  }
-
-  container.innerHTML = generatedScenes.map((scene, index) => `
-    <div class="scene-card">
-      <div class="scene-header">
-        <strong>Cena ${scene.number}</strong>
-        <span class="notice">${scene.start}s – ${scene.end}s</span>
-      </div>
-      <textarea data-scene-index="${index}">${escapeHtml(scene.prompt)}</textarea>
-      <div class="actions">
-        <button class="btn btn-small" data-copy-scene="${index}">Copiar prompt</button>
-        <button class="btn btn-small" data-reset-scene="${index}">Restaurar prompt</button>
-      </div>
-    </div>
-  `).join("");
-
-  container.querySelectorAll("[data-scene-index]").forEach((textarea) => {
-    textarea.addEventListener("input", () => {
-      const index = Number(textarea.dataset.sceneIndex);
-      generatedScenes[index].prompt = textarea.value;
-    });
-  });
-
-  container.querySelectorAll("[data-copy-scene]").forEach((button) => {
-    button.addEventListener("click", async () => {
-      const index = Number(button.dataset.copyScene);
-      await copyText(generatedScenes[index].prompt);
-      button.textContent = "Copiado!";
-      setTimeout(() => button.textContent = "Copiar prompt", 1200);
-    });
-  });
-
-  container.querySelectorAll("[data-reset-scene]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const index = Number(button.dataset.resetScene);
-      const freshScenes = buildScenes(currentProject);
-      generatedScenes[index].prompt = freshScenes[index].prompt;
-      renderScenes();
-    });
-  });
-}
-
-function createProject() {
-  const data = getFormData();
-
-  if (!data.idea) {
-    setStatus("createStatus", "Digite a ideia do vídeo antes de gerar.", "error");
-    $("idea").focus();
-    return;
-  }
-
-  currentProject = {
-    ...data,
-    script: buildScript(data),
-    scenes: buildScenes(data),
-    date: new Date().toISOString()
-  };
-
-  generatedScenes = currentProject.scenes.map((scene) => ({ ...scene }));
-  $("scriptOutput").value = currentProject.script;
-  renderScenes();
-
-  setStatus("createStatus", "Roteiro e cenas gerados! Você pode editar os textos.", "success");
-}
-
-$("generateButton").addEventListener("click", createProject);
-
-$("clearButton").addEventListener("click", () => {
-  ["idea", "characters", "setting", "product", "features", "continuity", "scriptOutput"]
-    .forEach((id) => $(id).value = "");
-
-  generatedScenes = [];
-  currentProject = null;
-  renderScenes();
-  setStatus("createStatus", "Campos limpos.");
+$("copyScriptButton").addEventListener("click",async()=>{
+const s=$("scriptOutput").value.trim();if(!s){setStatus("createStatus","Não há roteiro para copiar.","error");return;}
+await copyText(s);setStatus("createStatus","Roteiro copiado!","success");
 });
 
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch {
-    const temporary = document.createElement("textarea");
-    temporary.value = text;
-    document.body.appendChild(temporary);
-    temporary.select();
-    document.execCommand("copy");
-    temporary.remove();
-  }
+function getSavedProjects(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");}catch{return[];}}
+function saveProject(){
+if(!currentProject){setStatus("createStatus","Gere um roteiro antes de salvar.","error");return;}
+currentProject.script=$("scriptOutput").value;currentProject.scenes=generatedScenes.map(s=>({...s}));currentProject.id=currentProject.id||String(Date.now());
+const list=getSavedProjects(),i=list.findIndex(p=>p.id===currentProject.id);
+if(i>=0)list[i]=currentProject;else list.unshift(currentProject);
+localStorage.setItem(STORAGE_KEY,JSON.stringify(list));setStatus("createStatus","Projeto salvo neste navegador!","success");
+}
+$("saveProjectButton").addEventListener("click",saveProject);
+
+function loadProject(id){
+const p=getSavedProjects().find(x=>x.id===id);if(!p){alert("Projeto não encontrado.");return;}
+currentProject={...p};generatedScenes=(p.scenes||[]).map(s=>({...s}));
+$("contentType").value=p.kind||"fruta";$("platform").value=p.platform||"YouTube Shorts";$("duration").value=String(p.secs||60);$("visualStyle").value=p.style||"animação 3D colorida";
+$("idea").value=p.idea||"";$("characters").value=p.cast||"";$("setting").value=p.setting||"";$("product").value=p.product||"";$("features").value=p.features||"";$("continuity").value=p.continuity||"";$("scriptOutput").value=p.script||"";
+renderScenes();switchPage("create");setStatus("createStatus","Projeto carregado para edição.","success");
+}
+function deleteProject(id){
+if(!confirm("Deseja excluir este projeto salvo?"))return;
+localStorage.setItem(STORAGE_KEY,JSON.stringify(getSavedProjects().filter(p=>p.id!==id)));renderProjects();
+}
+function renderProjects(){
+const c=$("projectsContainer"),list=getSavedProjects();
+if(!list.length){c.innerHTML='<div class="empty">Nenhum projeto salvo ainda.</div>';return;}
+c.innerHTML=list.map(p=>`<div class="project-card"><div class="project-header"><strong>${escapeHtml(p.title||"Projeto sem título")}</strong><span class="notice">${escapeHtml(p.platform||"")}</span></div><p class="notice">${escapeHtml(p.idea||"")}</p><div class="actions"><button class="btn btn-small" data-load-project="${escapeHtml(p.id)}">Abrir</button><button class="btn btn-small" data-delete-project="${escapeHtml(p.id)}">Excluir</button></div></div>`).join("");
+c.querySelectorAll("[data-load-project]").forEach(b=>b.addEventListener("click",()=>loadProject(b.dataset.loadProject)));
+c.querySelectorAll("[data-delete-project]").forEach(b=>b.addEventListener("click",()=>deleteProject(b.dataset.deleteProject)));
+}
+function newProject(){
+currentProject=null;generatedScenes=[];
+$("contentType").value="fruta";$("platform").value="YouTube Shorts";$("duration").value="60";$("visualStyle").value="animação 3D colorida";
+["idea","characters","setting","product","features","continuity","scriptOutput"].forEach(id=>$(id).value="");
+renderScenes();switchPage("create");setStatus("createStatus","Novo projeto pronto.");
+}
+$("newProjectButton").addEventListener("click",newProject);
+
+async function callApi(path,options={}){
+const response=await fetch(API_BASE+path,{...options,headers:{"Content-Type":"application/json",...(options.headers||{})}});
+const raw=await response.text();let result={};
+try{result=raw?JSON.parse(raw):{};}catch{result={message:raw};}
+if(!response.ok)throw new Error(result.message||`Erro HTTP ${response.status}`);
+return result;
 }
 
-$("copyScriptButton").addEventListener("click", async () => {
-  const script = $("scriptOutput").value.trim();
+async function checkApiStatus(){
+try{
+const r=await callApi("/api/status");
+setStatus("geminiStatus",r.keyConfigured?"Servidor conectado. Chave Gemini configurada.":"Servidor conectado, mas a chave ainda não está configurada no backend.",r.keyConfigured?"success":"");
+}catch(e){setStatus("geminiStatus","Não foi possível verificar o servidor: "+e.message,"error");}
+}
+function openGeminiModal(){
+$("geminiModal").classList.add("open");$("geminiKey").value="";
+checkApiStatus();
+}
+function closeGeminiModal(){$("geminiModal").classList.remove("open");}
+$("geminiButton").addEventListener("click",openGeminiModal);
+$("closeGeminiButton").addEventListener("click",closeGeminiModal);
+$("geminiModal").addEventListener("click",e=>{if(e.target===$("geminiModal"))closeGeminiModal();});
 
-  if (!script) {
-    setStatus("createStatus", "Não há roteiro para copiar.", "error");
-    return;
-  }
-
-  await copyText(script);
-  setStatus("createStatus", "Roteiro copiado!", "success");
+$("saveGeminiButton").addEventListener("click",async()=>{
+const key=$("geminiKey").value.trim();
+if(!key){setStatus("geminiStatus","Cole sua chave antes de salvar.","error");return;}
+const button=$("saveGeminiButton");button.disabled=true;button.textContent="Enviando...";
+try{
+await callApi("/api/settings/gemini-key",{method:"POST",body:JSON.stringify({apiKey:key})});
+$("geminiKey").value="";
+const status=await callApi("/api/status");
+if(status.keyConfigured)setStatus("geminiStatus","Chave configurada com sucesso no servidor!","success");
+else setStatus("geminiStatus","O servidor recebeu a solicitação, mas ainda não confirmou a configuração. Verifique o backend.","error");
+}catch(e){setStatus("geminiStatus","Falha ao enviar a chave: "+e.message,"error");}
+finally{button.disabled=false;button.textContent="Salvar chave";}
 });
 
-function getSavedProjects() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-  } catch {
-    return [];
-  }
-}
-
-function saveProject() {
-  if (!currentProject) {
-    setStatus("createStatus", "Gere um roteiro antes de salvar.", "error");
-    return;
-  }
-
-  currentProject.script = $("scriptOutput").value;
-  currentProject.scenes = generatedScenes.map((scene) => ({ ...scene }));
-  currentProject.id = currentProject.id || String(Date.now());
-
-  const projects = getSavedProjects();
-  const existingIndex = projects.findIndex((project) => project.id === currentProject.id);
-
-  if (existingIndex >= 0) {
-    projects[existingIndex] = currentProject;
-  } else {
-    projects.unshift(currentProject);
-  }
-
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
-  setStatus("createStatus", "Projeto salvo neste navegador!", "success");
-}
-
-$("saveProjectButton").addEventListener("click", saveProject);function loadProject(projectId) {
-  const project = getSavedProjects().find((item) => item.id === projectId);
-
-  if (!project) {
-    alert("Projeto não encontrado.");
-    return;
-  }
-
-  currentProject = { ...project };
-  generatedScenes = (project.scenes || []).map((scene) => ({ ...scene }));
-
-  $("contentType").value = project.kind || "fruta";
-  $("platform").value = project.platform || "YouTube Shorts";
-  $("duration").value = String(project.secs || 60);
-  $("visualStyle").value = project.style || "animação 3D colorida";
-  $("idea").value = project.idea || "";
-  $("characters").value = project.cast || "";
-  $("setting").value = project.setting || "";
-  $("product").value = project.product || "";
-  $("features").value = project.features || "";
-  $("continuity").value = project.continuity || "";
-  $("scriptOutput").value = project.script || "";
-
-  renderScenes();
-  switchPage("create");
-  setStatus("createStatus", "Projeto carregado para edição.", "success");
-}
-
-function deleteProject(projectId) {
-  if (!confirm("Deseja excluir este projeto salvo?")) return;
-
-  const projects = getSavedProjects().filter((project) => project.id !== projectId);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
-  renderProjects();
-}
-
-function renderProjects() {
-  const container = $("projectsContainer");
-  const projects = getSavedProjects();
-
-  if (!projects.length) {
-    container.innerHTML = '<div class="empty">Nenhum projeto salvo ainda.</div>';
-    return;
-  }
-
-  container.innerHTML = projects.map((project) => `
-    <div class="project-card">
-      <div class="project-header">
-        <strong>${escapeHtml(project.title || "Projeto sem título")}</strong>
-        <span class="notice">${escapeHtml(project.platform || "")}</span>
-      </div>
-      <p class="notice">${escapeHtml(project.idea || "")}</p>
-      <div class="actions">
-        <button class="btn btn-small" data-load-project="${escapeHtml(project.id)}">Abrir</button>
-        <button class="btn btn-small" data-delete-project="${escapeHtml(project.id)}">Excluir</button>
-      </div>
-    </div>
-  `).join("");
-
-  container.querySelectorAll("[data-load-project]").forEach((button) => {
-    button.addEventListener("click", () => loadProject(button.dataset.loadProject));
-  });
-
-  container.querySelectorAll("[data-delete-project]").forEach((button) => {
-    button.addEventListener("click", () => deleteProject(button.dataset.deleteProject));
-  });
-}
-
-function newProject() {
-  currentProject = null;
-  generatedScenes = [];
-
-  $("contentType").value = "fruta";
-  $("platform").value = "YouTube Shorts";
-  $("duration").value = "60";
-  $("visualStyle").value = "animação 3D colorida";
-
-  ["idea", "characters", "setting", "product", "features", "continuity", "scriptOutput"]
-    .forEach((id) => $(id).value = "");
-
-  renderScenes();
-  switchPage("create");
-  setStatus("createStatus", "Novo projeto pronto.");
-}
-
-$("newProjectButton").addEventListener("click", newProject);
-
-function openGeminiModal() {
-  $("geminiModal").classList.add("open");
-  const savedKey = localStorage.getItem("viral-ai-gemini-key") || "";
-  $("geminiKey").value = savedKey;
-  setStatus(
-    "geminiStatus",
-    savedKey ? "Existe uma chave salva neste navegador." : "Chave não configurada."
-  );
-}
-
-function closeGeminiModal() {
-  $("geminiModal").classList.remove("open");
-}
-
-$("geminiButton").addEventListener("click", openGeminiModal);
-$("closeGeminiButton").addEventListener("click", closeGeminiModal);
-
-$("geminiModal").addEventListener("click", (event) => {
-  if (event.target === $("geminiModal")) closeGeminiModal();
+$("videoFiles").addEventListener("change",e=>{
+const files=Array.from(e.target.files||[]),c=$("videoPreview");if(!files.length)return;
+files.forEach(file=>{
+if(!file.type.startsWith("video/"))return;
+const url=URL.createObjectURL(file);importedVideoUrls.push(url);
+const label=document.createElement("p");label.className="notice";label.textContent=file.name;
+const video=document.createElement("video");video.src=url;video.controls=true;video.preload="metadata";video.style.width="100%";video.style.maxWidth="500px";video.style.display="block";video.style.marginTop="12px";video.style.borderRadius="10px";
+c.append(label,video);
+});
+setStatus("productionStatus",`${files.length} arquivo(s) importado(s).`,"success");e.target.value="";
+});
+$("clearVideosButton").addEventListener("click",()=>{
+importedVideoUrls.forEach(URL.revokeObjectURL);importedVideoUrls=[];$("videoPreview").innerHTML="";setStatus("productionStatus","Clipes removidos.");
 });
 
-$("saveGeminiButton").addEventListener("click", async () => {
-  const key = $("geminiKey").value.trim();
-
-  if (!key) {
-    localStorage.removeItem("viral-ai-gemini-key");
-    setStatus("geminiStatus", "Chave removida deste navegador.");
-    return;
-  }
-
-  localStorage.setItem("viral-ai-gemini-key", key);
-  setStatus("geminiStatus", "Chave salva neste navegador.", "success");
-});
-
-async function callApi(path, options = {}) {
-  const response = await fetch(API_BASE + path, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    }
-  });
-
-  const text = await response.text();
-  let result = {};
-
-  try {
-    result = text ? JSON.parse(text) : {};
-  } catch {
-    result = { message: text };
-  }
-
-  if (!response.ok) {
-    throw new Error(result.message || `Erro HTTP ${response.status}`);
-  }
-
-  return result;
-}
-
-async function checkApiStatus() {
-  try {
-    const result = await callApi("/api/status");
-    setStatus(
-      "geminiStatus",
-      result.message || "Serviço conectado.",
-      "success"
-    );
-  } catch {
-    setStatus(
-      "geminiStatus",
-      "Não foi possível confirmar a conexão com o serviço."
-    );
-  }
-}
-
-async function saveGeminiKeyToService() {
-  const key = $("geminiKey").value.trim();
-
-  if (!key) {
-    setStatus("geminiStatus", "Cole sua chave antes de salvar.", "error");
-    return;
-  }
-
-  try {
-    await callApi("/api/settings/gemini-key", {
-      method: "POST",
-      body: JSON.stringify({ apiKey: key })
-    });
-
-    localStorage.setItem("viral-ai-gemini-key", key);
-    setStatus("geminiStatus", "Chave enviada ao serviço conectado.", "success");
-  } catch (error) {
-    setStatus(
-      "geminiStatus",
-      "Não foi possível enviar a chave: " + error.message,
-      "error"
-    );
-  }
-}
-
-$("saveGeminiButton").addEventListener("dblclick", saveGeminiKeyToService);
-
-$("videoFiles").addEventListener("change", (event) => {
-  const files = Array.from(event.target.files || []);
-  const container = $("videoPreview");
-
-  if (!files.length) return;
-
-  files.forEach((file) => {
-    if (!file.type.startsWith("video/")) return;
-
-    const url = URL.createObjectURL(file);
-    importedVideoUrls.push(url);
-
-    const video = document.createElement("video");
-    video.src = url;
-    video.controls = true;
-    video.preload = "metadata";
-    video.style.width = "100%";
-    video.style.maxWidth = "500px";
-    video.style.display = "block";
-    video.style.marginTop = "12px";
-    video.style.borderRadius = "10px";
-
-    const label = document.createElement("p");
-    label.className = "notice";
-    label.textContent = file.name;
-
-    container.appendChild(label);
-    container.appendChild(video);
-  });
-
-  setStatus("productionStatus", `${files.length} arquivo(s) importado(s).`, "success");
-  event.target.value = "";
-});
-
-$("clearVideosButton").addEventListener("click", () => {
-  importedVideoUrls.forEach((url) => URL.revokeObjectURL(url));
-  importedVideoUrls = [];
-  $("videoPreview").innerHTML = "";
-  setStatus("productionStatus", "Clipes removidos.");
-});
-
-function initializeApp() {
-  renderProjects();
-  renderScenes();
-  checkApiStatus();
-}
-
+function initializeApp(){renderProjects();renderScenes();}
 initializeApp();
 </script>
 </body>
