@@ -1,3 +1,4 @@
+
 import 'dotenv/config';
 
 import express from 'express';
@@ -15,15 +16,15 @@ import { spawn } from 'node:child_process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
 
+const PORT = Number(process.env.PORT || 8000);
+const MODEL = process.env.MODEL || 'gemini-omni-1.1-flash';
+
+// Armazenamento: usa DATA_DIR se disponível; caso contrário, /tmp.
 let DATA = process.env.DATA_DIR || '/tmp/viral-ai-data';
 let VIDEOS = path.join(DATA, 'videos');
 let JOBS_FILE = path.join(DATA, 'jobs.json');
 
-const PORT = Number(process.env.PORT || 8000);
-const MODEL = process.env.MODEL || 'gemini-omni-1.1-flash';
-
 const app = express();
-
 app.set('trust proxy', 1);
 
 let runtimeGeminiKey = '';
@@ -34,7 +35,7 @@ async function prepareStorage() {
     await fs.access(DATA);
   } catch (error) {
     console.error(
-      'Diretório configurado indisponível:',
+      'Diretório configurado indisponível. Usando armazenamento temporário:',
       error.message
     );
 
@@ -63,17 +64,21 @@ const persist = async () => {
 
 const getGeminiKey = () =>
   runtimeGeminiKey ||
-  (process.env.GEMINI_API_KEY &&
-   process.env.GEMINI_API_KEY !== 'cole_sua_chave_aqui'
-    ? process.env.GEMINI_API_KEY
-    : '');
+  (
+    process.env.GEMINI_API_KEY &&
+    process.env.GEMINI_API_KEY !== 'cole_sua_chave_aqui'
+      ? process.env.GEMINI_API_KEY
+      : ''
+  );
 
 const hasKey = () => Boolean(getGeminiKey());
 
 const ai = () => {
   const key = getGeminiKey();
 
-  if (!key) throw new Error('GEMINI_KEY_MISSING');
+  if (!key) {
+    throw new Error('GEMINI_KEY_MISSING');
+  }
 
   return new GoogleGenAI({ apiKey: key });
 };
@@ -224,7 +229,9 @@ app.post('/api/flow/session/start', async (_req, res) => {
   } finally {
     flowStarting = false;
   }
-});// STATUS DA SESSÃO FLOW
+});
+
+// STATUS DA SESSÃO FLOW
 app.get('/api/flow/session/status', checkFlowToken, (_req, res) => {
   res.json({
     ok: true,
@@ -281,7 +288,6 @@ app.post('/api/flow/session/navigate', checkFlowToken, async (req, res) => {
     }
 
     const address = String(req.body?.url || '').trim();
-
     let parsedUrl;
 
     try {
@@ -599,7 +605,9 @@ app.post('/api/projects', async (req, res) => {
   await persist();
 
   res.status(201).json(jobs[id]);
-});// GERAÇÃO DE VÍDEOS COM GEMINI
+});
+
+// GERAÇÃO DE VÍDEOS COM GEMINI
 async function generateScene(project, scene) {
   scene.status = 'generating';
   scene.error = null;
@@ -607,7 +615,10 @@ async function generateScene(project, scene) {
   await persist();
 
   try {
-    const interaction = await ai().interactions.create({
+    const client = ai();
+
+    // Formato atual da Interactions API para geração de vídeo.
+    const interaction = await client.interactions.create({
       model: MODEL,
       input: scene.prompt,
       response_format: {
@@ -617,33 +628,56 @@ async function generateScene(project, scene) {
       }
     });
 
-    const b64 = interaction.output_video?.data;
+    // O SDK atual disponibiliza o vídeo neste campo.
+    const videoData = interaction.output_video?.data;
 
-    if (!b64) {
-      throw new Error(
-        'O Gemini não retornou um arquivo de vídeo nesta resposta.'
-      );
+    if (!videoData) {
+      const stepVideo = interaction.steps
+        ?.filter(step => step.type === 'model_output')
+        .flatMap(step => step.content || [])
+        .find(item => item.type === 'video' && item.data);
+
+      if (!stepVideo?.data) {
+        throw new Error(
+          'O Gemini concluiu a solicitação, mas não retornou os dados do vídeo.'
+        );
+      }
+
+      await saveSceneVideo(project, scene, stepVideo.data);
+    } else {
+      await saveSceneVideo(project, scene, videoData);
     }
 
-    const filename = `${project.id}_${scene.id}.mp4`;
-
-    await fs.writeFile(
-      path.join(VIDEOS, filename),
-      Buffer.from(b64, 'base64')
-    );
-
-    scene.status = 'completed';
-    scene.videoUrl = `/media/${filename}`;
   } catch (error) {
     scene.status = 'error';
 
     scene.error =
       error.message === 'GEMINI_KEY_MISSING'
         ? 'A chave Gemini ainda não foi configurada.'
-        : String(error.message || 'Falha na geração').slice(0, 500);
+        : String(error.message || 'Falha na geração').slice(0, 700);
+
+    console.error(
+      `Erro na geração da cena ${scene.number}:`,
+      scene.error
+    );
   }
 
   await persist();
+}
+
+async function saveSceneVideo(project, scene, base64Data) {
+  await fs.mkdir(VIDEOS, { recursive: true });
+
+  const filename = `${project.id}_${scene.id}.mp4`;
+
+  await fs.writeFile(
+    path.join(VIDEOS, filename),
+    Buffer.from(base64Data, 'base64')
+  );
+
+  scene.status = 'completed';
+  scene.videoUrl = `/media/${filename}`;
+  scene.error = null;
 }
 
 async function runProject(id) {
