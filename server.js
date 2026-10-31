@@ -1,4 +1,3 @@
-
 import 'dotenv/config';
 
 import express from 'express';
@@ -16,11 +15,11 @@ import { spawn } from 'node:child_process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
 
-const DATA = '/tmp/viral-ai-data';
-const VIDEOS = path.join(DATA, 'videos');
-const JOBS_FILE = path.join(DATA, 'jobs.json');
+let DATA = process.env.DATA_DIR || '/tmp/viral-ai-data';
+let VIDEOS = path.join(DATA, 'videos');
+let JOBS_FILE = path.join(DATA, 'jobs.json');
 
-const PORT = Number(process.env.PORT || 3000);
+const PORT = Number(process.env.PORT || 8000);
 const MODEL = process.env.MODEL || 'gemini-omni-1.1-flash';
 
 const app = express();
@@ -29,8 +28,25 @@ app.set('trust proxy', 1);
 
 let runtimeGeminiKey = '';
 
-await fs.mkdir(DATA, { recursive: true });
-await fs.mkdir(VIDEOS, { recursive: true });
+async function prepareStorage() {
+  try {
+    await fs.mkdir(VIDEOS, { recursive: true });
+    await fs.access(DATA);
+  } catch (error) {
+    console.error(
+      'Diretório configurado indisponível:',
+      error.message
+    );
+
+    DATA = '/tmp/viral-ai-data';
+    VIDEOS = path.join(DATA, 'videos');
+    JOBS_FILE = path.join(DATA, 'jobs.json');
+
+    await fs.mkdir(VIDEOS, { recursive: true });
+  }
+}
+
+await prepareStorage();
 
 let jobs = {};
 
@@ -41,6 +57,7 @@ try {
 }
 
 const persist = async () => {
+  await fs.mkdir(DATA, { recursive: true });
   await fs.writeFile(JOBS_FILE, JSON.stringify(jobs, null, 2));
 };
 
@@ -207,8 +224,7 @@ app.post('/api/flow/session/start', async (_req, res) => {
   } finally {
     flowStarting = false;
   }
-});
-
+});// STATUS DA SESSÃO FLOW
 app.get('/api/flow/session/status', checkFlowToken, (_req, res) => {
   res.json({
     ok: true,
@@ -223,6 +239,7 @@ app.get('/api/flow/session/status', checkFlowToken, (_req, res) => {
   });
 });
 
+// CAPTURA DA TELA
 app.get('/api/flow/session/screen', checkFlowToken, async (_req, res) => {
   try {
     if (!flowPage || flowPage.isClosed()) {
@@ -253,6 +270,7 @@ app.get('/api/flow/session/screen', checkFlowToken, async (_req, res) => {
   }
 });
 
+// NAVEGAR NO FLOW
 app.post('/api/flow/session/navigate', checkFlowToken, async (req, res) => {
   try {
     if (!flowPage || flowPage.isClosed()) {
@@ -306,6 +324,7 @@ app.post('/api/flow/session/navigate', checkFlowToken, async (req, res) => {
   }
 });
 
+// CLICAR NA TELA
 app.post('/api/flow/session/click', checkFlowToken, async (req, res) => {
   try {
     if (!flowPage || flowPage.isClosed()) {
@@ -346,6 +365,7 @@ app.post('/api/flow/session/click', checkFlowToken, async (req, res) => {
   }
 });
 
+// DIGITAR TEXTO
 app.post('/api/flow/session/type', checkFlowToken, async (req, res) => {
   try {
     if (!flowPage || flowPage.isClosed()) {
@@ -378,6 +398,7 @@ app.post('/api/flow/session/type', checkFlowToken, async (req, res) => {
   }
 });
 
+// PRESSIONAR TECLAS
 app.post('/api/flow/session/key', checkFlowToken, async (req, res) => {
   try {
     if (!flowPage || flowPage.isClosed()) {
@@ -423,6 +444,7 @@ app.post('/api/flow/session/key', checkFlowToken, async (req, res) => {
   }
 });
 
+// ENCERRAR SESSÃO FLOW
 app.post('/api/flow/session/stop', checkFlowToken, async (_req, res) => {
   await closeFlowSession();
 
@@ -474,7 +496,7 @@ app.get('/api/flow/browser-check', async (_req, res) => {
   }
 });
 
-// CHAVE GEMINI
+// CONFIGURAÇÃO DA CHAVE GEMINI
 app.post('/api/settings/gemini-key', (req, res) => {
   const apiKey = String(req.body?.apiKey || '').trim();
 
@@ -493,7 +515,7 @@ app.post('/api/settings/gemini-key', (req, res) => {
   });
 });
 
-// PROJETOS
+// LISTAR PROJETOS
 app.get('/api/projects', (_req, res) => {
   res.json({
     projects: Object.values(jobs).map(
@@ -509,6 +531,7 @@ app.get('/api/projects', (_req, res) => {
   });
 });
 
+// ABRIR UM PROJETO
 app.get('/api/projects/:id', (req, res) => {
   const job = jobs[req.params.id];
 
@@ -521,6 +544,7 @@ app.get('/api/projects/:id', (req, res) => {
   res.json(job);
 });
 
+// CRIAR PROJETO
 app.post('/api/projects', async (req, res) => {
   const {
     title,
@@ -575,9 +599,7 @@ app.post('/api/projects', async (req, res) => {
   await persist();
 
   res.status(201).json(jobs[id]);
-});
-
-// GERAÇÃO GEMINI
+});// GERAÇÃO DE VÍDEOS COM GEMINI
 async function generateScene(project, scene) {
   scene.status = 'generating';
   scene.error = null;
@@ -647,6 +669,7 @@ async function runProject(id) {
   await persist();
 }
 
+// INICIAR GERAÇÃO DO PROJETO
 app.post('/api/projects/:id/generate', async (req, res) => {
   const project = jobs[req.params.id];
 
@@ -684,6 +707,7 @@ app.post('/api/projects/:id/generate', async (req, res) => {
   setImmediate(() => runProject(project.id));
 });
 
+// REGENERAR UMA CENA
 app.post(
   '/api/projects/:id/scenes/:sceneId/regenerate',
   async (req, res) => {
@@ -742,7 +766,7 @@ app.post(
   }
 );
 
-// MONTAGEM DE VÍDEOS
+// MONTAGEM DOS VÍDEOS
 function ffmpegConcat(files, output) {
   return new Promise((resolve, reject) => {
     const list = path.join(DATA, `concat_${nanoid(8)}.txt`);
@@ -787,6 +811,7 @@ function ffmpegConcat(files, output) {
   });
 }
 
+// UNIR CENAS
 app.post('/api/projects/:id/merge', async (req, res) => {
   const project = jobs[req.params.id];
 
@@ -832,13 +857,15 @@ app.post('/api/projects/:id/merge', async (req, res) => {
   }
 });
 
-// ARQUIVOS E PÁGINA PRINCIPAL
+// DISPONIBILIZAR VÍDEOS
 app.use('/media', express.static(VIDEOS));
 
+// PÁGINA PRINCIPAL
 app.get('/', (_req, res) => {
   res.sendFile(path.join(ROOT, 'index.html'));
 });
 
+// TRATAMENTO DE ERROS
 app.use((error, req, res, next) => {
   console.error('Erro no servidor:', error.message);
 
@@ -851,7 +878,7 @@ app.use((error, req, res, next) => {
   });
 });
 
-// ENCERRAMENTO
+// ENCERRAMENTO DO SERVIDOR
 async function shutdown() {
   console.log('Encerrando VIRAL AI...');
 
@@ -863,6 +890,7 @@ async function shutdown() {
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
 
+// INICIAR SERVIDOR
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`VIRAL AI backend ativo na porta ${PORT}`);
 });
