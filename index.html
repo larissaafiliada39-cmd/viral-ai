@@ -1,717 +1,1069 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#10101b">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VIRAL AI</title>
+
 <style>
-:root{--bg:#0b0b13;--panel:#151522;--panel2:#1d1d2d;--line:#303047;--txt:#f5f4fb;--muted:#aaa8bd;--pink:#ff4fa3;--purple:#9b7bff;--green:#52d6a0;--red:#ff737d}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top right,#251638 0,#0b0b13 38%);color:var(--txt);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer;border:0;border-radius:11px;padding:11px 15px;background:linear-gradient(110deg,var(--pink),var(--purple));color:white;font-weight:700}button.secondary{background:var(--panel2);border:1px solid var(--line);color:var(--txt)}button.danger{background:#54212b}.wrap{max-width:1180px;margin:auto;padding:22px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}.brand{font-size:27px;font-weight:900;letter-spacing:1px}.brand span{color:var(--pink)}.sub,.small,.muted{color:var(--muted)}.tabs{display:flex;gap:8px;overflow:auto;padding:5px 0 14px}.tab{white-space:nowrap;background:var(--panel);border:1px solid var(--line);color:var(--muted)}.tab.active{background:#352044;color:white;border-color:#8c55a9}.panel{background:rgba(21,21,34,.96);border:1px solid var(--line);border-radius:17px;padding:20px;margin:12px 0;box-shadow:0 12px 35px #0003}.hidden{display:none!important}h1,h2,h3{margin:0 0 10px}h1{font-size:25px}h2{font-size:20px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field{display:flex;flex-direction:column;gap:6px;margin:10px 0}.field label{font-weight:700}.field input,.field textarea,.field select,.scene textarea{width:100%;background:#0e0e18;border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:11px;outline:none}.field textarea{min-height:95px;resize:vertical}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.output{white-space:pre-wrap;background:#0e0e18;border:1px solid var(--line);padding:15px;border-radius:12px;min-height:80px;overflow-wrap:anywhere}.studio-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:9px}.studio{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:left;color:var(--txt)}.studio.selected{border-color:var(--pink);background:#382039}.scene{background:#11111c;border:1px solid var(--line);border-radius:12px;padding:13px;margin:12px 0}.scene-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.tag{color:#ffc2df;font-size:12px}.status{padding:11px;border-radius:10px;background:#10101a;border:1px solid var(--line);margin-top:10px;white-space:pre-wrap}.good{color:var(--green)}.bad{color:var(--red)}.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:18px;z-index:20}.modal.show{display:flex}.dialog{width:min(520px,100%);background:#191927;border:1px solid #48405b;border-radius:18px;padding:22px;box-shadow:0 20px 70px #0009}.dialog input{width:100%;padding:13px;border-radius:10px;background:#0b0b13;border:1px solid var(--line);color:white;margin:8px 0 12px}.notice{font-size:13px;color:var(--muted);background:#222033;padding:11px;border-radius:10px}.empty{color:var(--muted);padding:15px}.video{width:100%;max-height:230px;margin-top:8px;border-radius:10px;background:#000}a{color:#ff9dce}@media(max-width:700px){.wrap{padding:13px}.grid{grid-template-columns:1fr}.panel{padding:15px}.brand{font-size:23px}}
+:root {
+  --bg: #100b18;
+  --panel: #1b1325;
+  --panel2: #241832;
+  --pink: #ff3e9d;
+  --purple: #a855f7;
+  --text: #f7f0ff;
+  --muted: #b9a9c9;
+  --border: #382647;
+  --green: #35d39a;
+  --red: #ff5d75;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button, input, textarea, select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.logo {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.logo span {
+  color: var(--pink);
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: 1px solid var(--border);
+  background: var(--panel2);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.btn:hover {
+  filter: brightness(1.15);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  border: none;
+  color: white;
+}
+
+.btn-small {
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.tab {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  padding: 11px 16px;
+  border-radius: 10px;
+}
+
+.tab.active {
+  background: #382044;
+  color: white;
+  border-color: var(--pink);
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+.panel h2, .panel h3 {
+  margin-top: 0;
+}
+
+.panel-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+
+.field label {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+input, textarea, select {
+  width: 100%;
+  color: var(--text);
+  background: #100b18;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 12px;
+  outline: none;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--pink);
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+select option {
+  background: #1b1325;
+}
+
+.actions {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.notice {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.status {
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: #241832;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.status.success {
+  color: var(--green);
+}
+
+.status.error {
+  color: var(--red);
+}
+
+.scene-card, .project-card {
+  background: #160f20;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  padding: 15px;
+  margin-top: 12px;
+}
+
+.scene-header, .project-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.scene-header strong, .project-header strong {
+  color: var(--pink);
+}
+
+.scene-card textarea {
+  min-height: 130px;
+}
+
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 25px 10px;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1000;
+}
+
+.modal.open {
+  display: flex;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 500px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+}
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 20px 0 5px;
+}
+
+@media (max-width: 700px) {
+  .app {
+    padding: 12px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    padding: 15px;
+  }
+
+  .logo {
+    font-size: 22px;
+  }
+}
 </style>
 </head>
+
 <body>
-<div class="wrap">
-<header class="top"><div><div class="brand">VIRAL <span>AI</span></div><div class="sub">Sua central de criação de conteúdo</div></div><button class="secondary" id="openKeyModal">⚙ Configurar Gemini</button></header>
+<div class="app">
+
+<header>
+  <div>
+    <div class="logo">VIRAL <span>AI</span></div>
+    <div class="subtitle">Crie roteiros, cenas e projetos para vídeos com inteligência artificial.</div>
+  </div>
+
+  <div class="header-actions">
+    <button class="btn" id="geminiButton">Configurar Gemini</button>
+    <button class="btn btn-primary" id="newProjectButton">＋ Novo projeto</button>
+  </div>
+</header>
+
 <nav class="tabs">
-<button class="tab active" data-tab="create">Criar projeto</button><button class="tab" data-tab="production">Produção</button><button class="tab" data-tab="projects">Meus projetos</button><button class="tab" data-tab="guide">Ajuda</button>
+  <button class="tab active" data-page="create">🎬 Criar</button>
+  <button class="tab" data-page="production">🎥 Produção</button>
+  <button class="tab" data-page="projects">📁 Projetos</button>
+  <button class="tab" data-page="guide">❔ Ajuda</button>
 </nav>
+
 <main>
-<section id="create">
-<div class="panel"><h1>Escolha seu estúdio</h1><p class="muted">Selecione o tipo de conteúdo que deseja criar.</p><div class="studio-grid" id="studioGrid"></div></div>
-<div class="panel"><h2>Detalhes do projeto</h2>
-<div class="grid">
-<div class="field"><label for="title">Nome do projeto</label><input id="title" placeholder="Ex.: A novela da fruta"></div>
-<div class="field"><label for="duration">Duração total (segundos)</label><input id="duration" type="number" min="10" max="600" value="60"></div>
-<div class="field"><label for="style">Estilo visual</label><select id="style"><option>3D colorido estilo animação infantil</option><option>Fotorealista cinematográfico</option><option>Dorama cinematográfico</option><option>Novela dramática realista</option><option>Cartoon 2D original</option><option>UGC / vídeo de celular natural</option><option>Documental</option></select></div>
-<div class="field"><label for="platform">Plataforma</label><select id="platform"><option>YouTube Shorts</option><option>TikTok</option><option>Instagram Reels</option><option>YouTube</option><option>TikTok Shop / Shopee</option></select></div>
-</div>
-<div class="field"><label for="idea">Ideia ou tema</label><textarea id="idea" placeholder="Conte o que acontece no vídeo, a mensagem ou a história..."></textarea></div>
-<div class="grid">
-<div class="field"><label for="cast">Personagens / apresentador</label><textarea id="cast" placeholder="Nomes, aparência, personalidade e voz..."></textarea></div>
-<div class="field"><label for="setting">Cenário principal</label><textarea id="setting" placeholder="Descreva o cenário e objetos importantes..."></textarea></div>
-<div class="field"><label for="product">Produto (se houver)</label><input id="product" placeholder="Nome do produto"></div>
-<div class="field"><label for="features">Características confirmadas do produto</label><textarea id="features" placeholder="Não invente características; informe apenas as confirmadas."></textarea></div>
-</div>
-<div class="actions"><button id="makeScript">✨ Criar roteiro-base</button><button class="secondary" id="toProduction">Criar cenas de 10 segundos</button></div>
-<div id="scriptResult" class="output hidden"></div>
-<div class="actions hidden" id="scriptActions"><button class="secondary" id="copyScript">Copiar roteiro</button><button class="secondary" id="saveProject">Salvar projeto</button></div>
-</div>
+
+<section class="page active" id="page-create">
+  <div class="panel">
+    <div class="panel-title">✨ Criar conteúdo viral</div>
+
+    <div class="grid">
+      <div class="field">
+        <label for="contentType">Tipo de conteúdo</label>
+        <select id="contentType">
+          <option value="fruta">Frutas falantes</option>
+          <option value="sabonete">Sabonetes e produtos</option>
+          <option value="dorama">Dorama / história dramática</option>
+          <option value="criancas">Animação infantil</option>
+          <option value="filme">Filme / curta-metragem</option>
+          <option value="musica">Música infantil</option>
+          <option value="biblia">História bíblica</option>
+          <option value="reddit">História estilo Reddit</option>
+          <option value="motivacao">Motivacional</option>
+          <option value="ugc">UGC / anúncio realista</option>
+          <option value="foto">Prompt para imagem</option>
+          <option value="produto">Vídeo de produto</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="platform">Plataforma</label>
+        <select id="platform">
+          <option value="YouTube Shorts">YouTube Shorts</option>
+          <option value="TikTok">TikTok</option>
+          <option value="Instagram Reels">Instagram Reels</option>
+          <option value="YouTube">YouTube</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="duration">Duração aproximada</label>
+        <select id="duration">
+          <option value="30">30 segundos</option>
+          <option value="60" selected>1 minuto</option>
+          <option value="90">1 minuto e 30 segundos</option>
+          <option value="180">3 minutos</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="visualStyle">Estilo visual</label>
+        <select id="visualStyle">
+          <option value="animação 3D colorida">Animação 3D colorida</option>
+          <option value="animação 2D">Animação 2D</option>
+          <option value="fotorealista">Fotorealista</option>
+          <option value="cinematográfico">Cinematográfico</option>
+          <option value="estilo desenho infantil">Desenho infantil</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="idea">Ideia / tema do vídeo</label>
+      <textarea id="idea" placeholder="Descreva a ideia do vídeo, personagens, acontecimentos ou mensagem..."></textarea>
+    </div>
+
+    <div class="grid">
+      <div class="field">
+        <label for="characters">Personagens</label>
+        <input id="characters" placeholder="Ex.: pinguim fofo, frutas falantes">
+      </div>
+
+      <div class="field">
+        <label for="setting">Cenário</label>
+        <input id="setting" placeholder="Ex.: quarto colorido, floresta mágica">
+      </div>
+
+      <div class="field">
+        <label for="product">Produto (se houver)</label>
+        <input id="product" placeholder="Nome ou descrição do produto">
+      </div>
+
+      <div class="field">
+        <label for="features">Detalhes importantes</label>
+        <input id="features" placeholder="Ex.: cores, aparência, características">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="continuity">Continuidade entre cenas</label>
+      <textarea id="continuity" placeholder="Descreva o que deve permanecer igual entre as cenas (personagens, roupas, cenário etc.)."></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="generateButton">✨ Gerar roteiro e cenas</button>
+      <button class="btn" id="clearButton">Limpar</button>
+    </div>
+
+    <div class="status" id="createStatus">Preencha a ideia e clique em “Gerar roteiro e cenas”.</div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">📝 Roteiro</div>
+    <div class="field">
+      <textarea id="scriptOutput" placeholder="O roteiro gerado aparecerá aqui..."></textarea>
+    </div>
+    <div class="actions">
+      <button class="btn" id="copyScriptButton">Copiar roteiro</button>
+      <button class="btn" id="saveProjectButton">Salvar projeto</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">🎞️ Cenas e prompts</div>
+    <div id="scenesContainer">
+      <div class="empty">Suas cenas aparecerão aqui depois de gerar o roteiro.</div>
+    </div>
+  </div>
 </section>
-<section id="production" class="hidden">
-<div class="panel"><h1>Produção do vídeo</h1><p class="muted">Revise cada cena, gere pelo backend configurado e acompanhe o andamento.</p><div id="continuity" class="status">Crie um roteiro e as cenas primeiro.</div><div id="sceneList"></div>
-<div class="actions"><button class="secondary" id="copyAll">Copiar todos os prompts</button><button class="secondary" id="downloadPrompts">Baixar prompts (.txt)</button><button id="generateGemini">Gerar com Gemini</button><button class="secondary" id="mergeGemini">Unir MP4 gerado</button></div><div id="geminiJobStatus" class="status">Aguardando ação.</div></div>
-<div class="panel"><h2>Importar clipes externos</h2><p class="muted">Você pode selecionar clipes baixados do Flow para visualizar e organizar. A união automática depende do backend e dos arquivos enviados a ele.</p><input id="clipFiles" type="file" accept="video/*" multiple><div id="clipList"></div><div class="actions"><button class="secondary" id="clearClips">Limpar clipes</button></div><div id="assembly" class="status">Nenhum vídeo montado.</div></div>
-<div class="panel"><h2>Conexão com o servidor</h2><div class="field"><label for="apiBase">Endereço HTTPS do backend</label><input id="apiBase" type="url" value="https://viral-ai.hostless.app"></div><div class="actions"><button class="secondary" id="checkApi">Testar conexão</button><button class="secondary" id="openKeyModal2">Cadastrar chave Gemini</button><button class="secondary" id="getGeminiKey">Obter chave no Google AI Studio</button></div><div id="apiStatus" class="status">Servidor ainda não testado.</div></div>
+
+<section class="page" id="page-production">
+  <div class="panel">
+    <div class="panel-title">🎥 Produção de vídeo</div>
+    <p class="notice">Importe clipes do seu dispositivo para organizar uma prévia do projeto. A montagem final depende de um editor de vídeo ou de um serviço de produção conectado.</p>
+
+    <div class="field">
+      <label for="videoFiles">Importar clipes</label>
+      <input id="videoFiles" type="file" accept="video/*" multiple>
+    </div>
+
+    <div id="videoPreview"></div>
+
+    <div class="actions">
+      <button class="btn" id="clearVideosButton">Limpar clipes</button>
+    </div>
+
+    <div class="status" id="productionStatus">Nenhum clipe importado.</div>
+  </div>
 </section>
-<section id="projects" class="hidden"><div class="panel"><h1>Meus projetos</h1><div id="projectList" class="empty">Nenhum projeto salvo neste dispositivo.</div></div></section>
-<section id="guide" class="hidden"><div class="panel"><h1>Como usar o VIRAL AI</h1><ol><li>Escolha um estúdio e preencha os detalhes do projeto.</li><li>Crie o roteiro-base e revise o texto.</li><li>Crie cenas de até 10 segundos e ajuste os prompts.</li><li>Configure o servidor e cadastre sua chave Gemini pelo botão dentro do aplicativo.</li><li>Use a geração somente quando o backend indicar que a chave está configurada.</li></ol><p class="notice">Este projeto é um protótipo em evolução. A criação de roteiro e prompts é feita localmente no navegador. A geração real de vídeo só funciona se o backend tiver integração compatível com o modelo e a API disponíveis. A chave é enviada ao servidor por HTTPS; a persistência depende da configuração segura de armazenamento no servidor.</p></div></section>
+
+<section class="page" id="page-projects">
+  <div class="panel">
+    <div class="panel-title">📁 Meus projetos</div>
+    <p class="notice">Os projetos são salvos neste navegador. Eles não são enviados automaticamente para a nuvem.</p>
+    <div id="projectsContainer">
+      <div class="empty">Nenhum projeto salvo ainda.</div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-guide">
+  <div class="panel">
+    <div class="panel-title">❔ Como usar o VIRAL AI</div>
+    <ol>
+      <li>Escolha o tipo de conteúdo e a plataforma.</li>
+      <li>Escreva a ideia do vídeo e os detalhes dos personagens.</li>
+      <li>Clique em “Gerar roteiro e cenas”.</li>
+      <li>Edite os textos e copie os prompts para sua ferramenta de vídeo.</li>
+      <li>Salve o projeto para continuar depois.</li>
+      <li>Na aba Produção, importe clipes para organizá-los.</li>
+    </ol>
+    <p class="notice">A configuração do Gemini e a geração por API dependem de uma conexão válida com o serviço.</p>
+  </div>
+</section>
+
 </main>
-</div><div class="modal" id="keyModal" role="dialog" aria-modal="true" aria-labelledby="keyTitle">
-<div class="dialog">
-<h2 id="keyTitle">Configurar chave Gemini</h2>
-<p class="muted">Cole sua chave do Google AI Studio. Ela será enviada diretamente ao backend por HTTPS.</p>
-<input id="geminiKeyInput" type="password" autocomplete="off" placeholder="Cole sua chave Gemini aqui">
-<div class="notice">Não coloque sua chave em publicações ou mensagens. Esta tela não a salva no navegador. O servidor precisa ter armazenamento seguro configurado para manter a chave após reinicializações.</div>
-<div id="keyStatus" class="status">Aguardando chave.</div>
-<div class="actions">
-<button id="saveKey">Salvar chave no servidor</button>
-<button class="secondary" id="getGeminiKeyModal">Criar/obter chave</button>
-<button class="secondary" id="closeKeyModal">Fechar</button>
-</div>
-</div>
+
+<footer>VIRAL AI • Ferramenta de criação de conteúdo</footer>
 </div>
 
-<script>
-const $=id=>document.getElementById(id);
-
-const studioNames={
-fruit:'Novelas de frutas',
-soap:'Novelas tradicionais',
-dorama:'Doramas',
-kids:'Desenhos infantis',
-movie:'Filmes infantis',
-song:'Músicas infantis',
-bible:'Conteúdo bíblico',
-reddit:'Histórias Reddit',
-motivation:'Motivacionais',
-ugc:'UGC / TikTok Shop',
-photo:'Provador virtual',
-product:'Vídeos de produtos'
-};
-
-let kind='fruit';
-let project=null;
-let scriptText='';
-let scenes=[];
-let remoteProjectId=null;
-let importedClips=[];
-
-const studioGrid=$('studioGrid');
-
-Object.entries(studioNames).forEach(([k,n])=>{
-const b=document.createElement('button');
-b.className='studio'+(k===kind?' selected':'');
-b.textContent=n;
-
-b.onclick=()=>{
-kind=k;
-document.querySelectorAll('.studio').forEach(x=>x.classList.remove('selected'));
-b.classList.add('selected');
-};
-
-studioGrid.appendChild(b);
-});
-
-function openModal(){
-$('keyModal').classList.add('show');
-$('geminiKeyInput').focus();
-}
-
-function closeModal(){
-$('keyModal').classList.remove('show');
-}
-
-$('openKeyModal').onclick=openModal;
-$('openKeyModal2').onclick=openModal;
-$('closeKeyModal').onclick=closeModal;
-
-$('getGeminiKey').onclick=$('getGeminiKeyModal').onclick=()=>{
-window.open('https://aistudio.google.com/app/apikey','_blank','noopener');
-};
-
-function baseUrl(){
-return (
-localStorage.getItem('viral-ai-api-base') ||
-$('apiBase').value.trim() ||
-'https://viral-ai.hostless.app'
-).replace(/\/+$/,'');
-}
-
-async function api(path,options={}){
-const base=baseUrl();
-
-if(!/^https:\/\//i.test(base)){
-throw new Error('O endereço do backend precisa começar com HTTPS.');
-}
-
-const response=await fetch(base+path,{
-...options,
-headers:{
-Accept:'application/json',
-'Content-Type':'application/json',
-...(options.headers||{})
-}
-});
-
-const data=await response.json().catch(()=>({}));
-
-if(!response.ok){
-throw new Error(data.error||`Erro HTTP ${response.status}`);
-}
-
-return data;
-}
-
-$('apiBase').value=
-localStorage.getItem('viral-ai-api-base') ||
-'https://viral-ai.hostless.app';
-
-$('checkApi').onclick=async()=>{
-const base=$('apiBase').value.trim().replace(/\/+$/,'');
-
-if(!/^https:\/\//i.test(base)){
-$('apiStatus').textContent='Informe um endereço HTTPS válido.';
-return;
-}
-
-localStorage.setItem('viral-ai-api-base',base);
-$('apiStatus').textContent='Testando conexão…';
-
-try{
-const d=await api('/api/status');
-
-$('apiStatus').innerHTML=d.keyConfigured
-?'<span class="good">Servidor conectado • chave Gemini configurada.</span>'
-:'<span class="bad">Servidor conectado • falta cadastrar a chave Gemini.</span>';
-
-}catch(e){
-$('apiStatus').textContent='Falha na conexão: '+e.message;
-}
-};
-
-$('saveKey').onclick=async()=>{
-const key=$('geminiKeyInput').value.trim();
-
-if(!key){
-$('keyStatus').textContent='Cole sua chave antes de salvar.';
-return;
-}
-
-if(!/^https:\/\//i.test(baseUrl())){
-$('keyStatus').textContent='O backend precisa usar HTTPS.';
-return;
-}
-
-$('saveKey').disabled=true;
-$('keyStatus').textContent='Enviando a chave com segurança…';
-
-try{
-
-const d=await api('/api/settings/gemini-key',{
-method:'POST',
-body:JSON.stringify({apiKey:key})
-});
-
-$('geminiKeyInput').value='';
-
-$('keyStatus').innerHTML=
-'<span class="good">'+
-(d.message||'Chave recebida pelo servidor.')+
-'</span>';
-
-$('apiStatus').textContent='Chave enviada. Verificando…';
-
-const status=await api('/api/status');
-
-$('apiStatus').textContent=status.keyConfigured
-?'Servidor conectado • Gemini pronto.'
-:'O servidor recebeu a solicitação, mas ainda informa que a chave não está configurada.';
-
-}catch(e){
-
-$('geminiKeyInput').value='';
-
-$('keyStatus').textContent=e.message.includes('404')
-?'A tela está pronta; o servidor ainda precisa da atualização da rota de cadastro da chave (/api/settings/gemini-key).'
-:'Não foi possível cadastrar a chave: '+e.message;
-
-}finally{
-$('saveKey').disabled=false;
-}
-};function buildScript(){
-
-const title=$('title').value.trim()||'Meu projeto VIRAL AI';
-const idea=$('idea').value.trim();
-
-if(!idea){
-alert('Descreva a ideia do projeto primeiro.');
-return;
-}
-
-const secs=Math.max(10,Math.min(600,Number($('duration').value)||60));
-const cast=$('cast').value.trim();
-const setting=$('setting').value.trim();
-const style=$('style').value;
-const product=$('product').value.trim();
-const features=$('features').value.trim();
-const platform=$('platform').value;
-
-const hook='Abrir com uma imagem, pergunta ou acontecimento que desperte curiosidade nos primeiros segundos.';
-
-const continuity=['fruit','soap','dorama','kids','movie'].includes(kind)
-?`PERSONAGENS FIXOS: ${cast||'Definir nomes, aparência, roupas, personalidade e voz.'}
-CENÁRIO FIXO: ${setting||'Definir cenário principal e paleta visual.'}
-REGRA: manter identidade, aparência, roupa, voz e personalidade consistentes entre cenas.`
-:`IDENTIDADE VISUAL: manter o mesmo apresentador, produto, voz e estilo visual em todas as cenas.`;
-
-const productInfo=['ugc','photo','product'].includes(kind)
-?`
-PRODUTO: ${product||'A definir'}
-CARACTERÍSTICAS INFORMADAS: ${features||'Não inventar características não fornecidas.'}
-PLATAFORMA: ${platform}`
-:'';
-
-const structure=kind==='reddit'
-?'ESTRUTURA: contexto → conflito → acontecimentos → revelações → resolução satisfatória.'
-:kind==='bible'
-?'ESTRUTURA: tema → contexto bíblico → reflexão → aplicação prática.'
-:'ESTRUTURA: apresentação → desenvolvimento → momento marcante → conclusão satisfatória.';
-
-scriptText=`VIRAL AI — ${title.toUpperCase()}
-ESTÚDIO: ${studioNames[kind]}
-DURAÇÃO: ${secs} segundos | ESTILO: ${style} | FORMATO: vertical 9:16
-PLATAFORMA: ${platform}
-
-IDEIA: ${idea}
-
-GANCHO: ${hook}
-
-${structure}
-
-${continuity}${productInfo}
-CENÁRIO: ${setting||'Definir de acordo com a ideia.'}
-
-ROTEIRO-BASE
-Criar uma narrativa coerente, com falas naturais, ações visuais claras e ritmo adequado à duração. Desenvolver a ideia sem contradizer os acontecimentos. Entregar um desfecho satisfatório no próprio vídeo.
-
-ENCERRAMENTO / CTA
-Finalizar com uma frase memorável e convite natural para comentar, seguir ou conhecer o produto, sem promessas enganosas.
-
-NOTA: este é um roteiro-base estruturado pelo protótipo; revise fatos, falas, versículos, alegações de produto e direitos de uso antes de publicar.`;
-
-project={
-title,kind,idea,secs,cast,setting,style,product,features,platform,continuity,script:scriptText
-};
-
-$('scriptResult').classList.remove('hidden');
-$('scriptResult').textContent=scriptText;
-$('scriptActions').classList.remove('hidden');
-}
-
-function makeScenes(){
-
-if(!project){
-alert('Crie o roteiro primeiro.');
-return;
-}
-
-const count=Math.ceil(project.secs/10);
-scenes=[];
-
-for(let i=0;i<count;i++){
-
-const start=i*10;
-const end=Math.min((i+1)*10,project.secs);
-const duration=end-start;
-
-const beat=i===0
-?'ABERTURA: apresentar a situação e prender a atenção.'
-:i===count-1
-?'ENCERRAMENTO: concluir a ação e entregar o desfecho.'
-:`CONTINUAÇÃO: avançar a história a partir do último quadro da cena ${i}.`;
-
-const prompt=`VIRAL AI — CENA ${String(i+1).padStart(2,'0')} (${start}-${end}s; ${duration}s)
-PROJETO: ${project.title}
-ESTÚDIO: ${studioNames[project.kind]}
-CONTINUIDADE FIXA: ${project.continuity}
-ESTILO: ${project.style}; vídeo vertical 9:16; áudio e diálogos em português brasileiro.
-IDEIA: ${project.idea}
-PERSONAGENS: ${project.cast||'Conforme definido no projeto.'}
-CENÁRIO: ${project.setting||'Manter o cenário estabelecido.'}
-AÇÃO: ${beat}
-INSTRUÇÃO: ${i===0?'Estabelecer visualmente personagens e cenário.':`Começar do estado final da cena ${i}, sem reiniciar a história.`}
-EVITAR: mudanças involuntárias de identidade, roupa, voz, cenário, objetos ou posições; personagens duplicados; texto ilegível; cortes contraditórios.
-REFERÊNCIA: reutilizar as mesmas imagens/Ingredients dos personagens e, se possível, o último frame da cena anterior.`;
-
-scenes.push({
-n:i+1,
-start,
-end,
-duration,
-prompt,
-edit:prompt
-});
-
-}
-
-renderScenes();
-
-$('continuity').textContent=
-'Ficha de continuidade — '+project.title+'\n'+project.continuity;
-
-document.querySelector('[data-tab="production"]').click();
-}
-
-function esc(s){
-return String(s).replace(/[&<>"']/g,c=>({
-'&':'&amp;',
-'<':'&lt;',
-'>':'&gt;',
-'"':'&quot;',
-"'":'&#39;'
-}[c]));
-}
-
-function renderScenes(){
-
-$('sceneList').innerHTML=scenes.map((s,i)=>`
-<div class="scene">
-<div class="scene-head">
-<b>CENA ${String(s.n).padStart(2,'0')} • ${s.start}–${s.end}s</b>
-<span class="tag">${s.duration} segundos</span>
+<div class="modal" id="geminiModal">
+  <div class="modal-content">
+    <h2>Configurar Gemini</h2>
+    <p class="notice">Insira sua chave de API para habilitar recursos conectados ao Gemini.</p>
+
+    <div class="field">
+      <label for="geminiKey">Chave da API</label>
+      <input id="geminiKey" type="password" placeholder="Cole sua chave aqui">
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="saveGeminiButton">Salvar chave</button>
+      <button class="btn" id="closeGeminiButton">Fechar</button>
+    </div>
+
+    <p class="notice">Nunca compartilhe sua chave de API. Use apenas em um ambiente confiável.</p>
+    <div class="status" id="geminiStatus">Chave não configurada.</div>
+  </div>
 </div>
-<textarea data-scene="${i}" rows="9">${esc(s.edit)}</textarea>
-<div class="actions">
-<button class="secondary" onclick="copyScene(${i})">Copiar prompt</button>
-<button class="secondary" onclick="resetScene(${i})">Restaurar</button>
-</div>
-</div>
-`).join('');
 
+<script>const API_BASE = "https://viral-ai.hostless.app";
+const STORAGE_KEY = "viral-ai-v2";
+
+let currentProject = null;
+let generatedScenes = [];
+let importedVideoUrls = [];
+
+const $ = (id) => document.getElementById(id);
+
+function setStatus(id, message, type = "") {
+  const element = $(id);
+  if (!element) return;
+  element.textContent = message;
+  element.className = "status" + (type ? " " + type : "");
 }
 
-window.copyScene=async i=>{
-
-const el=document.querySelector(`[data-scene="${i}"]`);
-scenes[i].edit=el.value;
-
-try{
-await navigator.clipboard.writeText(el.value);
-alert('Prompt copiado!');
-}catch{
-alert('Selecione e copie o texto.');
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[char]));
 }
 
-};
+function switchPage(pageName) {
+  document.querySelectorAll(".tab").forEach((button) => {
+    button.classList.toggle("active", button.dataset.page === pageName);
+  });
 
-window.resetScene=i=>{
-scenes[i].edit=scenes[i].prompt;
-renderScenes();
-};
+  document.querySelectorAll(".page").forEach((page) => {
+    page.classList.toggle("active", page.id === "page-" + pageName);
+  });
 
-$('makeScript').onclick=buildScript;
-$('toProduction').onclick=makeScenes;
+  if (pageName === "projects") renderProjects();
+}
 
-$('copyScript').onclick=()=>{
-navigator.clipboard.writeText(scriptText)
-.then(()=>alert('Roteiro copiado!'))
-.catch(()=>alert('Selecione e copie o roteiro.'));
-};
-
-$('copyAll').onclick=()=>{
-
-scenes.forEach((s,i)=>{
-const el=document.querySelector(`[data-scene="${i}"]`);
-if(el)s.edit=el.value;
+document.querySelectorAll(".tab").forEach((button) => {
+  button.addEventListener("click", () => switchPage(button.dataset.page));
 });
 
-navigator.clipboard.writeText(
-scenes.map(s=>s.edit).join('\n\n--- PRÓXIMA CENA ---\n\n')
-)
-.then(()=>alert('Todos os prompts foram copiados!'))
-.catch(()=>alert('Selecione e copie os prompts.'));
-
-};
-
-function download(name,txt){
-
-const a=document.createElement('a');
-const url=URL.createObjectURL(
-new Blob([txt],{type:'text/plain;charset=utf-8'})
-);
-
-a.href=url;
-a.download=name;
-a.click();
-
-URL.revokeObjectURL(url);
+function getFormData() {
+  return {
+    title: $("idea").value.trim().slice(0, 80) || "Meu projeto VIRAL AI",
+    kind: $("contentType").value,
+    platform: $("platform").value,
+    secs: Number($("duration").value),
+    style: $("visualStyle").value,
+    idea: $("idea").value.trim(),
+    cast: $("characters").value.trim(),
+    setting: $("setting").value.trim(),
+    product: $("product").value.trim(),
+    features: $("features").value.trim(),
+    continuity: $("continuity").value.trim()
+  };
 }
 
-$('downloadPrompts').onclick=()=>{
+function buildScript(data) {
+  const idea = data.idea || "Uma história divertida e envolvente";
+  const characters = data.cast || "personagens carismáticos";
+  const setting = data.setting || "um cenário colorido";
+  const product = data.product ? ` Produto: ${data.product}.` : "";
+  const details = data.features ? ` Detalhes: ${data.features}.` : "";
+  const total = data.secs;
 
-scenes.forEach((s,i)=>{
-const el=document.querySelector(`[data-scene="${i}"]`);
-if(el)s.edit=el.value;
+  if (data.kind === "reddit") {
+    return `TÍTULO: ${data.title}\n\n` +
+      `GANCHO:\n${idea}\n\n` +
+      `HISTÓRIA:\n` +
+      `A história começa com uma situação inesperada envolvendo ${characters}. ` +
+      `Aos poucos, novos detalhes aparecem e aumentam a curiosidade. ` +
+      `O conflito cresce até uma revelação surpreendente, mas coerente. ` +
+      `No final, os acontecimentos são esclarecidos e a história termina de forma satisfatória.\n\n` +
+      `DURAÇÃO: aproximadamente ${total} segundos.\n` +
+      `PLATAFORMA: ${data.platform}.`;
+  }
+
+  if (data.kind === "musica" || data.kind === "criancas") {
+    return `TÍTULO: ${data.title}\n\n` +
+      `[INTRO]\n${characters} chegou para brincar!\n` +
+      `Todo mundo vai cantar!\n\n` +
+      `[VERSO 1]\n${idea}\n` +
+      `Bate palmas, gira então,\n` +
+      `Vem dançar nessa canção!\n\n` +
+      `[REFRÃO]\n` +
+      `Pula, pula, sem parar,\n` +
+      `Todo mundo vai cantar!\n` +
+      `Gira, gira pelo chão,\n` +
+      `Bate palmas, bate a mão!\n\n` +
+      `[FINAL]\n` +
+      `Tchau, tchau, até já!\n` +
+      `A brincadeira vai voltar!`;
+  }
+
+  if (data.kind === "motivacao") {
+    return `TÍTULO: ${data.title}\n\n` +
+      `GANCHO:\n${idea}\n\n` +
+      `NARRAÇÃO:\n` +
+      `Nem todos os dias serão fáceis, mas cada passo importa. ` +
+      `Mesmo quando ninguém percebe seu esforço, continue construindo seu caminho. ` +
+      `Não precisa ser perfeito: precisa ser verdadeiro e constante. ` +
+      `A mudança começa quando você decide não desistir de si.\n\n` +
+      `ENCERRAMENTO:\n${idea}\n\n` +
+      `DURAÇÃO: aproximadamente ${total} segundos.`;
+  }
+
+  if (data.kind === "ugc" || data.kind === "produto") {
+    return `TÍTULO: ${data.title}\n\n` +
+      `[GANCHO]\nVocê precisa conhecer isso!\n\n` +
+      `[APRESENTAÇÃO]\n${idea}\n\n` +
+      `[DEMONSTRAÇÃO]\n` +
+      `Mostre ${data.product || "o produto"} em uso, destacando seus detalhes. ` +
+      `${data.features}\n\n` +
+      `[ENCERRAMENTO]\n` +
+      `Apresente uma chamada para ação natural, sem promessas exageradas.\n\n` +
+      `DURAÇÃO: aproximadamente ${total} segundos.`;
+  }
+
+  return `TÍTULO: ${data.title}\n\n` +
+    `[CENA INICIAL — GANCHO]\n${idea}\n\n` +
+    `[DESENVOLVIMENTO]\n` +
+    `${characters} está em ${setting}. ` +
+    `A história se desenvolve com uma sequência de acontecimentos visuais e emocionantes. ` +
+    `Cada cena avança a narrativa e mantém a atenção do público.\n\n` +
+    `[MOMENTO PRINCIPAL]\n` +
+    `Apresente o acontecimento mais importante da história de forma clara e marcante.\n\n` +
+    `[ENCERRAMENTO]\n` +
+    `Finalize com uma conclusão visual satisfatória.\n\n` +
+    `ESTILO: ${data.style}.\n` +
+    `DURAÇÃO: aproximadamente ${total} segundos.\n` +
+    `${product}${details}`;
+}
+
+function buildScenes(data) {
+  const sceneCount = Math.max(1, Math.ceil(data.secs / 10));
+  const scenes = [];
+
+  for (let index = 0; index < sceneCount; index++) {
+    const start = index * 10;
+    const end = Math.min(start + 10, data.secs);
+
+    const phase = index === 0
+      ? "abertura com gancho visual"
+      : index === sceneCount - 1
+        ? "encerramento marcante e satisfatório"
+        : "desenvolvimento da história";
+
+    const prompt = [
+      `Cena ${index + 1}, duração aproximada de ${end - start} segundos.`,
+      `Tipo de conteúdo: ${data.kind}.`,
+      `Ideia: ${data.idea || "história envolvente"}.`,
+      `Ação da cena: ${phase}.`,
+      `Personagens: ${data.cast || "personagens principais"}.`,
+      `Cenário: ${data.setting || "cenário adequado à história"}.`,
+      `Estilo visual: ${data.style}.`,
+      `Formato vertical 9:16 para ${data.platform}.`,
+      data.product ? `Produto: ${data.product}.` : "",
+      data.features ? `Detalhes importantes: ${data.features}.` : "",
+      data.continuity ? `Continuidade: ${data.continuity}.` : "",
+      "Manter aparência, roupas, cores e características dos personagens consistentes.",
+      "Movimento natural, composição clara, sem textos aleatórios na imagem."
+    ].filter(Boolean).join(" ");
+
+    scenes.push({
+      number: index + 1,
+      start,
+      end,
+      prompt
+    });
+  }
+
+  return scenes;
+}
+
+function renderScenes() {
+  const container = $("scenesContainer");
+
+  if (!generatedScenes.length) {
+    container.innerHTML = '<div class="empty">Nenhuma cena criada.</div>';
+    return;
+  }
+
+  container.innerHTML = generatedScenes.map((scene, index) => `
+    <div class="scene-card">
+      <div class="scene-header">
+        <strong>Cena ${scene.number}</strong>
+        <span class="notice">${scene.start}s – ${scene.end}s</span>
+      </div>
+      <textarea data-scene-index="${index}">${escapeHtml(scene.prompt)}</textarea>
+      <div class="actions">
+        <button class="btn btn-small" data-copy-scene="${index}">Copiar prompt</button>
+        <button class="btn btn-small" data-reset-scene="${index}">Restaurar prompt</button>
+      </div>
+    </div>
+  `).join("");
+
+  container.querySelectorAll("[data-scene-index]").forEach((textarea) => {
+    textarea.addEventListener("input", () => {
+      const index = Number(textarea.dataset.sceneIndex);
+      generatedScenes[index].prompt = textarea.value;
+    });
+  });
+
+  container.querySelectorAll("[data-copy-scene]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const index = Number(button.dataset.copyScene);
+      await copyText(generatedScenes[index].prompt);
+      button.textContent = "Copiado!";
+      setTimeout(() => button.textContent = "Copiar prompt", 1200);
+    });
+  });
+
+  container.querySelectorAll("[data-reset-scene]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const index = Number(button.dataset.resetScene);
+      const freshScenes = buildScenes(currentProject);
+      generatedScenes[index].prompt = freshScenes[index].prompt;
+      renderScenes();
+    });
+  });
+}
+
+function createProject() {
+  const data = getFormData();
+
+  if (!data.idea) {
+    setStatus("createStatus", "Digite a ideia do vídeo antes de gerar.", "error");
+    $("idea").focus();
+    return;
+  }
+
+  currentProject = {
+    ...data,
+    script: buildScript(data),
+    scenes: buildScenes(data),
+    date: new Date().toISOString()
+  };
+
+  generatedScenes = currentProject.scenes.map((scene) => ({ ...scene }));
+  $("scriptOutput").value = currentProject.script;
+  renderScenes();
+
+  setStatus("createStatus", "Roteiro e cenas gerados! Você pode editar os textos.", "success");
+}
+
+$("generateButton").addEventListener("click", createProject);
+
+$("clearButton").addEventListener("click", () => {
+  ["idea", "characters", "setting", "product", "features", "continuity", "scriptOutput"]
+    .forEach((id) => $(id).value = "");
+
+  generatedScenes = [];
+  currentProject = null;
+  renderScenes();
+  setStatus("createStatus", "Campos limpos.");
 });
 
-download(
-'viral-ai-prompts.txt',
-scenes.map(s=>s.edit).join('\n\n--- PRÓXIMA CENA ---\n\n')
-);
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const temporary = document.createElement("textarea");
+    temporary.value = text;
+    document.body.appendChild(temporary);
+    temporary.select();
+    document.execCommand("copy");
+    temporary.remove();
+  }
+}
 
-};
+$("copyScriptButton").addEventListener("click", async () => {
+  const script = $("scriptOutput").value.trim();
 
-$('saveProject').onclick=()=>{
+  if (!script) {
+    setStatus("createStatus", "Não há roteiro para copiar.", "error");
+    return;
+  }
 
-if(!project)return;
-
-const list=JSON.parse(
-localStorage.getItem('viral-ai-v2')||'[]'
-);
-
-list.unshift({
-...project,
-scenes,
-date:new Date().toLocaleString('pt-BR')
+  await copyText(script);
+  setStatus("createStatus", "Roteiro copiado!", "success");
 });
 
-localStorage.setItem('viral-ai-v2',JSON.stringify(list));
-
-alert('Projeto salvo neste dispositivo.');
-renderProjects();
-
-};
-
-function renderProjects(){
-
-const list=JSON.parse(
-localStorage.getItem('viral-ai-v2')||'[]'
-);
-
-$('projectList').className=list.length?'':'empty';
-
-$('projectList').innerHTML=list.length
-?list.map((p,i)=>`
-<div class="scene">
-<b>${esc(p.title)}</b>
-<p class="small">${esc(p.date)} • ${esc(studioNames[p.kind]||p.kind)}</p>
-<button class="secondary" onclick="loadProject(${i})">Abrir projeto</button>
-</div>
-`).join('')
-:'Nenhum projeto salvo neste dispositivo.';
-
+function getSavedProjects() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  } catch {
+    return [];
+  }
 }
 
-window.loadProject=i=>{
+function saveProject() {
+  if (!currentProject) {
+    setStatus("createStatus", "Gere um roteiro antes de salvar.", "error");
+    return;
+  }
 
-const p=JSON.parse(
-localStorage.getItem('viral-ai-v2')||'[]'
-)[i];
+  currentProject.script = $("scriptOutput").value;
+  currentProject.scenes = generatedScenes.map((scene) => ({ ...scene }));
+  currentProject.id = currentProject.id || String(Date.now());
 
-project=p;
-kind=p.kind;
-scriptText=p.script;
-scenes=p.scenes||[];
+  const projects = getSavedProjects();
+  const existingIndex = projects.findIndex((project) => project.id === currentProject.id);
 
-$('title').value=p.title;
-$('idea').value=p.idea;
-$('cast').value=p.cast||'';
-$('setting').value=p.setting||'';
-$('duration').value=p.secs;
-$('style').value=p.style;
-$('product').value=p.product||'';
-$('features').value=p.features||'';
-$('platform').value=p.platform||'YouTube Shorts';
+  if (existingIndex >= 0) {
+    projects[existingIndex] = currentProject;
+  } else {
+    projects.unshift(currentProject);
+  }
 
-document.querySelectorAll('.studio').forEach((b,i)=>{
-const k=Object.keys(studioNames)[i];
-b.classList.toggle('selected',k===kind);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+  setStatus("createStatus", "Projeto salvo neste navegador!", "success");
+}
+
+$("saveProjectButton").addEventListener("click", saveProject);function loadProject(projectId) {
+  const project = getSavedProjects().find((item) => item.id === projectId);
+
+  if (!project) {
+    alert("Projeto não encontrado.");
+    return;
+  }
+
+  currentProject = { ...project };
+  generatedScenes = (project.scenes || []).map((scene) => ({ ...scene }));
+
+  $("contentType").value = project.kind || "fruta";
+  $("platform").value = project.platform || "YouTube Shorts";
+  $("duration").value = String(project.secs || 60);
+  $("visualStyle").value = project.style || "animação 3D colorida";
+  $("idea").value = project.idea || "";
+  $("characters").value = project.cast || "";
+  $("setting").value = project.setting || "";
+  $("product").value = project.product || "";
+  $("features").value = project.features || "";
+  $("continuity").value = project.continuity || "";
+  $("scriptOutput").value = project.script || "";
+
+  renderScenes();
+  switchPage("create");
+  setStatus("createStatus", "Projeto carregado para edição.", "success");
+}
+
+function deleteProject(projectId) {
+  if (!confirm("Deseja excluir este projeto salvo?")) return;
+
+  const projects = getSavedProjects().filter((project) => project.id !== projectId);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+  renderProjects();
+}
+
+function renderProjects() {
+  const container = $("projectsContainer");
+  const projects = getSavedProjects();
+
+  if (!projects.length) {
+    container.innerHTML = '<div class="empty">Nenhum projeto salvo ainda.</div>';
+    return;
+  }
+
+  container.innerHTML = projects.map((project) => `
+    <div class="project-card">
+      <div class="project-header">
+        <strong>${escapeHtml(project.title || "Projeto sem título")}</strong>
+        <span class="notice">${escapeHtml(project.platform || "")}</span>
+      </div>
+      <p class="notice">${escapeHtml(project.idea || "")}</p>
+      <div class="actions">
+        <button class="btn btn-small" data-load-project="${escapeHtml(project.id)}">Abrir</button>
+        <button class="btn btn-small" data-delete-project="${escapeHtml(project.id)}">Excluir</button>
+      </div>
+    </div>
+  `).join("");
+
+  container.querySelectorAll("[data-load-project]").forEach((button) => {
+    button.addEventListener("click", () => loadProject(button.dataset.loadProject));
+  });
+
+  container.querySelectorAll("[data-delete-project]").forEach((button) => {
+    button.addEventListener("click", () => deleteProject(button.dataset.deleteProject));
+  });
+}
+
+function newProject() {
+  currentProject = null;
+  generatedScenes = [];
+
+  $("contentType").value = "fruta";
+  $("platform").value = "YouTube Shorts";
+  $("duration").value = "60";
+  $("visualStyle").value = "animação 3D colorida";
+
+  ["idea", "characters", "setting", "product", "features", "continuity", "scriptOutput"]
+    .forEach((id) => $(id).value = "");
+
+  renderScenes();
+  switchPage("create");
+  setStatus("createStatus", "Novo projeto pronto.");
+}
+
+$("newProjectButton").addEventListener("click", newProject);
+
+function openGeminiModal() {
+  $("geminiModal").classList.add("open");
+  const savedKey = localStorage.getItem("viral-ai-gemini-key") || "";
+  $("geminiKey").value = savedKey;
+  setStatus(
+    "geminiStatus",
+    savedKey ? "Existe uma chave salva neste navegador." : "Chave não configurada."
+  );
+}
+
+function closeGeminiModal() {
+  $("geminiModal").classList.remove("open");
+}
+
+$("geminiButton").addEventListener("click", openGeminiModal);
+$("closeGeminiButton").addEventListener("click", closeGeminiModal);
+
+$("geminiModal").addEventListener("click", (event) => {
+  if (event.target === $("geminiModal")) closeGeminiModal();
 });
 
-$('scriptResult').classList.remove('hidden');
-$('scriptResult').textContent=scriptText;
-$('scriptActions').classList.remove('hidden');
+$("saveGeminiButton").addEventListener("click", async () => {
+  const key = $("geminiKey").value.trim();
 
-if(scenes.length){
-renderScenes();
-$('continuity').textContent=p.continuity;
-}
+  if (!key) {
+    localStorage.removeItem("viral-ai-gemini-key");
+    setStatus("geminiStatus", "Chave removida deste navegador.");
+    return;
+  }
 
-document.querySelector('[data-tab="create"]').click();
-
-};
-
-$('generateGemini').onclick=async()=>{
-
-try{
-
-if(!scenes.length){
-throw new Error('Crie o roteiro e as cenas primeiro.');
-}
-
-$('geminiJobStatus').textContent=
-'Conferindo conexão e chave Gemini…';
-
-let status;
-
-try{
-status=await api('/api/status');
-}catch(e){
-throw new Error('Não foi possível conectar ao servidor: '+e.message);
-}
-
-if(!status.keyConfigured){
-
-$('geminiJobStatus').textContent=
-'A chave Gemini ainda não está cadastrada. Cadastre-a na janela que será aberta.';
-
-openModal();
-return;
-
-}
-
-const payload={
-title:project?.title||'Projeto VIRAL AI',
-aspectRatio:'9:16',
-scenes:scenes.map((s,i)=>({
-prompt:
-document.querySelector(`[data-scene="${i}"]`)?.value||
-s.edit||
-s.prompt
-}))
-};
-
-const created=await api('/api/projects',{
-method:'POST',
-body:JSON.stringify(payload)
+  localStorage.setItem("viral-ai-gemini-key", key);
+  setStatus("geminiStatus", "Chave salva neste navegador.", "success");
 });
 
-remoteProjectId=created.id;
+async function callApi(path, options = {}) {
+  const response = await fetch(API_BASE + path, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    }
+  });
 
-await api(`/api/projects/${remoteProjectId}/generate`,{
-method:'POST',
-body:'{}'
+  const text = await response.text();
+  let result = {};
+
+  try {
+    result = text ? JSON.parse(text) : {};
+  } catch {
+    result = { message: text };
+  }
+
+  if (!response.ok) {
+    throw new Error(result.message || `Erro HTTP ${response.status}`);
+  }
+
+  return result;
+}
+
+async function checkApiStatus() {
+  try {
+    const result = await callApi("/api/status");
+    setStatus(
+      "geminiStatus",
+      result.message || "Serviço conectado.",
+      "success"
+    );
+  } catch {
+    setStatus(
+      "geminiStatus",
+      "Não foi possível confirmar a conexão com o serviço."
+    );
+  }
+}
+
+async function saveGeminiKeyToService() {
+  const key = $("geminiKey").value.trim();
+
+  if (!key) {
+    setStatus("geminiStatus", "Cole sua chave antes de salvar.", "error");
+    return;
+  }
+
+  try {
+    await callApi("/api/settings/gemini-key", {
+      method: "POST",
+      body: JSON.stringify({ apiKey: key })
+    });
+
+    localStorage.setItem("viral-ai-gemini-key", key);
+    setStatus("geminiStatus", "Chave enviada ao serviço conectado.", "success");
+  } catch (error) {
+    setStatus(
+      "geminiStatus",
+      "Não foi possível enviar a chave: " + error.message,
+      "error"
+    );
+  }
+}
+
+$("saveGeminiButton").addEventListener("dblclick", saveGeminiKeyToService);
+
+$("videoFiles").addEventListener("change", (event) => {
+  const files = Array.from(event.target.files || []);
+  const container = $("videoPreview");
+
+  if (!files.length) return;
+
+  files.forEach((file) => {
+    if (!file.type.startsWith("video/")) return;
+
+    const url = URL.createObjectURL(file);
+    importedVideoUrls.push(url);
+
+    const video = document.createElement("video");
+    video.src = url;
+    video.controls = true;
+    video.preload = "metadata";
+    video.style.width = "100%";
+    video.style.maxWidth = "500px";
+    video.style.display = "block";
+    video.style.marginTop = "12px";
+    video.style.borderRadius = "10px";
+
+    const label = document.createElement("p");
+    label.className = "notice";
+    label.textContent = file.name;
+
+    container.appendChild(label);
+    container.appendChild(video);
+  });
+
+  setStatus("productionStatus", `${files.length} arquivo(s) importado(s).`, "success");
+  event.target.value = "";
 });
 
-$('geminiJobStatus').textContent=
-'Projeto enviado ao backend. Acompanhando geração…';
-
-const poll=async()=>{
-
-const p=await api(`/api/projects/${remoteProjectId}`);
-
-$('geminiJobStatus').textContent=
-`Status: ${p.status}\n`+
-(p.scenes||[]).map(x=>
-`Cena ${x.number}: ${x.status}${x.error?' — '+x.error:''}`
-).join('\n');
-
-if(['generating','queued'].includes(p.status)){
-setTimeout(poll,12000);
-}else if(p.status==='completed'){
-$('geminiJobStatus').textContent+=
-' \nGeração concluída. Você pode tentar unir o MP4.';
-}
-
-};
-
-setTimeout(poll,8000);
-
-}catch(e){
-
-$('geminiJobStatus').textContent=e.message;
-
-}
-
-};
-
-$('mergeGemini').onclick=async()=>{
-
-try{
-
-if(!remoteProjectId){
-throw new Error('Envie um projeto para geração primeiro.');
-}
-
-$('geminiJobStatus').textContent='Montando MP4…';
-
-const d=await api(
-`/api/projects/${remoteProjectId}/merge`,
-{
-method:'POST',
-body:'{}'
-}
-);
-
-$('geminiJobStatus').innerHTML=
-`<b>Vídeo final informado pelo servidor.</b><br>
-<a href="${esc(baseUrl()+d.finalUrl)}" target="_blank" rel="noopener">Abrir / baixar MP4</a>`;
-
-}catch(e){
-
-$('geminiJobStatus').textContent=e.message;
-
-}
-
-};
-
-$('clipFiles').onchange=e=>{
-
-for(const f of Array.from(e.target.files||[])){
-
-if(f.type.startsWith('video/')){
-
-importedClips.push({
-name:f.name,
-size:f.size,
-url:URL.createObjectURL(f)
+$("clearVideosButton").addEventListener("click", () => {
+  importedVideoUrls.forEach((url) => URL.revokeObjectURL(url));
+  importedVideoUrls = [];
+  $("videoPreview").innerHTML = "";
+  setStatus("productionStatus", "Clipes removidos.");
 });
 
+function initializeApp() {
+  renderProjects();
+  renderScenes();
+  checkApiStatus();
 }
 
-}
-
-renderClipList();
-
-};
-
-function renderClipList(){
-
-$('clipList').innerHTML=importedClips.length
-?importedClips.map((f,i)=>`
-<div class="scene">
-<b>${i+1}. ${esc(f.name)}</b>
-<div class="small">${(f.size/1024/1024).toFixed(1)} MB</div>
-<video class="video" controls playsinline src="${f.url}"></video>
-</div>
-`).join('')
-:'<p class="empty">Nenhum clipe importado.</p>';
-
-}
-
-$('clearClips').onclick=()=>{
-
-importedClips.forEach(f=>URL.revokeObjectURL(f.url));
-importedClips=[];
-$('clipFiles').value='';
-renderClipList();
-
-};
-
-document.querySelectorAll('.tab').forEach(b=>{
-
-b.onclick=()=>{
-
-document.querySelectorAll('.tab').forEach(x=>
-x.classList.toggle('active',x===b)
-);
-
-['create','production','projects','guide'].forEach(id=>
-$(id).classList.toggle('hidden',id!==b.dataset.tab)
-);
-
-if(b.dataset.tab==='projects'){
-renderProjects();
-}
-
-};
-
-});
-
-renderProjects();
-renderClipList();
-
+initializeApp();
 </script>
 </body>
 </html>
